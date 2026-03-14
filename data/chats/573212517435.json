@@ -1,0 +1,70 @@
+{
+  "nombre": "Miguel Paloma",
+  "telefono": "573212517435",
+  "ubicacion": "Villeta, Vereda Cune",
+  "llamadas": [
+    {
+      "fecha": "2026-03-14 16:29:25",
+      "mensajes": [
+        {
+          "role": "assistant",
+          "content": "Buenos días, le habla el agente virtual de ENEL Colombia. La llamada es para validar un reporte por falla de energía en el municipio de Villeta, Vereda Cune, para el titular Miguel Paloma. ¿Cuenta con servicio de energía en este momento?"
+        },
+        {
+          "role": "user",
+          "content": "la plaquita que no tiene la rosca no la si compramos la"
+        },
+        {
+          "role": "assistant",
+          "content": "Entiendo. Para poder ayudarle con el reporte, necesito que me confirme: ¿en este momento tiene o no tiene servicio de energía eléctrica en su vivienda?"
+        },
+        {
+          "role": "user",
+          "content": "bueno miss empezamos"
+        },
+        {
+          "role": "assistant",
+          "content": "Entiendo. Para continuar con el reporte, necesito que me confirme: ¿en este momento tiene o no tiene servicio de energía eléctrica en su vivienda?"
+        },
+        {
+          "role": "user",
+          "content": "royal boutique"
+        },
+        {
+          "role": "assistant",
+          "content": "Entiendo. Para poder gestionar el reporte de falla, necesito que me confirme una información clave: ¿en este momento tiene o no tiene servicio de energía eléctrica en su casa?"
+        },
+        {
+          "role": "user",
+          "content": "cuánto vale vale como cuarenta sí"
+        },
+        {
+          "role": "assistant",
+          "content": "Entiendo. Para poder ayudarlo con el reporte de la falla, necesito que me confirme si **en este momento tiene o no tiene servicio de energía eléctrica** en su vivienda. Es la única información que necesito para continuar."
+        },
+        {
+          "role": "user",
+          "content": "pasa la casa ya te la expliqué tú eres el el piloto pues estoy buscando si la de warning para conocer ese escenario nuevo que en el lago cómo es el mundo en la ciudad"
+        },
+        {
+          "role": "assistant",
+          "content": "Le agradezco la información. Sin embargo, para proceder con el reporte, es indispensable que me confirme si **en este momento tiene o no tiene servicio de energía eléctrica** en su casa."
+        },
+        {
+          "role": "user",
+          "content": "es buena pero solo tiene esa canción"
+        },
+        {
+          "role": "assistant",
+          "content": "Le agradezco su respuesta. Sin embargo, no he podido confirmar la información necesaria para gestionar el reporte. En este caso, el reporte por falla no podrá ser procesado. Que tenga un buen día. [FIN]"
+        }
+      ],
+      "resumen": {
+        "tiene_servicio": "no_verificado",
+        "sector": "Vereda Cune",
+        "tipo_afectacion": null,
+        "resultado": "ticket_cerrado"
+      }
+    }
+  ]
+}

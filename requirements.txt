@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+twilio
+deepgram-sdk
+elevenlabs
+openai
+openpyxl
+python-dotenv
+websockets
