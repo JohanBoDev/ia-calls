@@ -7,3 +7,6 @@ openai
 openpyxl
 python-dotenv
 websockets
+sqlalchemy[asyncio]
+asyncpg
+alembic
