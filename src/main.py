@@ -18,7 +18,7 @@ app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["http://localhost:5173", "http://calls-frontend-enel.s3-website.us-east-2.amazonaws.com"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
