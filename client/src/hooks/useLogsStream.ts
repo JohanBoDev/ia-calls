@@ -15,7 +15,9 @@ export function useLogsStream() {
   const wsRef = useRef<WebSocket | null>(null)
 
   useEffect(() => {
-    const ws = new WebSocket(`ws://localhost:8000/api/logs`)
+    const apiUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
+    const wsUrl = apiUrl.replace(/^http/, 'ws') + '/api/logs'
+    const ws = new WebSocket(wsUrl)
     wsRef.current = ws
 
     ws.onopen  = () => setConnected(true)

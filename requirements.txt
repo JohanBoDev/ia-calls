@@ -1,7 +1,7 @@
 fastapi
 uvicorn[standard]
 twilio
-deepgram-sdk
+deepgram-sdk==3.10.1
 openai
 python-dotenv
 websockets

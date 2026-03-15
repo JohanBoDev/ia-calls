@@ -87,6 +87,7 @@ async def _ejecutar_llamadas(tickets: list) -> dict:
                 numero_ticket=ticket.numero_ticket,
                 telefono=telefono,
                 municipio=ticket.municipio,
+                sector=ticket.sector or "",
                 llamada_id=llamada_id,
                 historial=historial_inicial,
                 saludo_audio=audio,

@@ -205,7 +205,8 @@ class CallStreamHandler:
 
     async def _paso_3(self, texto: str) -> None:
         """Sector de la falla (voz libre)"""
-        self.session.sector = texto
+        if not self.session.sector:
+            self.session.sector = texto
         self.session.historial.append({"role": "user", "content": texto})
         self.session.respuestas.append({"pregunta": "¿Cuál es el sector de la falla?", "respuesta": texto})
         self.session.paso_actual = 4

@@ -93,7 +93,7 @@ export default function DashboardPage() {
                 </h2>
                 <ResponsiveContainer width="100%" height={180}>
                   <PieChart>
-                    <Pie data={stats.distribucion_tipo} dataKey="cantidad" nameKey="tipo" cx="50%" cy="50%" outerRadius={70} label={({ tipo }) => tipo.replace('_', ' ')}>
+                    <Pie data={stats.distribucion_tipo} dataKey="cantidad" nameKey="tipo" cx="50%" cy="50%" outerRadius={70} label={({ name }) => String(name).replace('_', ' ')}>
                       {stats.distribucion_tipo.map((entry) => (
                         <Cell key={entry.tipo} fill={TIPO_COLOR[entry.tipo] ?? '#8b949e'} />
                       ))}
