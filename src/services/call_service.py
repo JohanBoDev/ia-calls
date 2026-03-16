@@ -152,23 +152,40 @@ async def manejar_call_status(call_sid: str, status: str) -> None:
     log.info("Estado de llamada %s: %s", call_sid, status)
 
     if status == "completed" and not session.terminada:
-        # Si el cliente nunca interactuó (paso_actual sigue en 2), no fue colgar sino no contestar
         hubo_interaccion = session.paso_actual > 2 or len(session.respuestas) > 0
-        resultado     = "cliente_colgo"   if hubo_interaccion else "no_contesto"
-        estado_ticket = EstadoTicket.completado if hubo_interaccion else EstadoTicket.no_contesto
-        if session.llamada_id:
-            await finalizar_llamada(
-                llamada_id=session.llamada_id,
-                ticket_id=session.ticket_id,
-                resultado=resultado,
-                estado_ticket=estado_ticket,
-                sector=session.sector,
-                tipo_afectacion=session.tipo_afectacion,
-                historial=session.historial,
-                respuestas=session.respuestas,
-            )
         async with session_lock:
             sessions.pop(call_sid, None)
+
+        if not hubo_interaccion:
+            # No contestó — agendar reintento si quedan intentos
+            if session.intentos < settings.MAX_INTENTOS:
+                log.info("No hubo interacción — programando reintento para %s", call_sid)
+                asyncio.create_task(_reintento(session, "no_contesto"))
+            else:
+                log.info("No hubo interacción y máximo de intentos alcanzado para %s", call_sid)
+                if session.llamada_id:
+                    await finalizar_llamada(
+                        llamada_id=session.llamada_id,
+                        ticket_id=session.ticket_id,
+                        resultado=f"nunca_contesto_{session.intentos}_intentos",
+                        estado_ticket=EstadoTicket.no_contesto,
+                        sector="",
+                        tipo_afectacion="",
+                        historial=[],
+                        respuestas=[],
+                    )
+        else:
+            if session.llamada_id:
+                await finalizar_llamada(
+                    llamada_id=session.llamada_id,
+                    ticket_id=session.ticket_id,
+                    resultado="cliente_colgo",
+                    estado_ticket=EstadoTicket.completado,
+                    sector=session.sector,
+                    tipo_afectacion=session.tipo_afectacion,
+                    historial=session.historial,
+                    respuestas=session.respuestas,
+                )
         return
 
     if status == "failed":
