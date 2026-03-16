@@ -9,20 +9,40 @@ interface Props {
 
 export function PageHeader({ title, back, children }: Props) {
   return (
-    <div className="flex items-center justify-between mb-8">
-      <div className="flex items-center gap-3">
-        {back && (
-          <Link
-            to={back.to}
-            className="flex items-center gap-1 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            {back.label}
-          </Link>
+    <div style={{ marginBottom: 28 }}>
+      {back && (
+        <Link
+          to={back.to}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
+            fontSize: 12,
+            color: 'var(--text-secondary)',
+            textDecoration: 'none',
+            marginBottom: 10,
+            fontWeight: 500,
+          }}
+        >
+          <ChevronLeft size={14} />
+          {back.label}
+        </Link>
+      )}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <h1
+          style={{
+            fontSize: 24,
+            fontWeight: 800,
+            color: 'var(--text-primary)',
+            letterSpacing: '-0.01em',
+          }}
+        >
+          {title}
+        </h1>
+        {children && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>{children}</div>
         )}
-        <h1 className="text-2xl font-bold text-[var(--text-primary)]">{title}</h1>
       </div>
-      {children && <div className="flex items-center gap-3">{children}</div>}
     </div>
   )
 }

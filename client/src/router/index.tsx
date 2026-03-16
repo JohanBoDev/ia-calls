@@ -1,4 +1,5 @@
 import { createBrowserRouter } from 'react-router-dom'
+import { AppLayout } from '@/components/layout/AppLayout'
 import DashboardPage from '@/pages/DashboardPage'
 import ClientesPage from '@/pages/ClientesPage'
 import ClienteChatPage from '@/pages/ClienteChatPage'
@@ -8,11 +9,16 @@ import LogsPage from '@/pages/LogsPage'
 import NotFoundPage from '@/pages/NotFoundPage'
 
 export const router = createBrowserRouter([
-  { path: '/',                        element: <DashboardPage /> },
-  { path: '/clientes',                element: <ClientesPage /> },
-  { path: '/clientes/nuevo',          element: <NuevoTicketPage /> },
-  { path: '/clientes/:numero_ticket', element: <ClienteChatPage /> },
-  { path: '/sesiones',                element: <SesionesPage /> },
-  { path: '/logs',                    element: <LogsPage /> },
-  { path: '*',                        element: <NotFoundPage /> },
+  {
+    element: <AppLayout />,
+    children: [
+      { path: '/',                        element: <DashboardPage /> },
+      { path: '/clientes',                element: <ClientesPage /> },
+      { path: '/clientes/nuevo',          element: <NuevoTicketPage /> },
+      { path: '/clientes/:numero_ticket', element: <ClienteChatPage /> },
+      { path: '/sesiones',                element: <SesionesPage /> },
+      { path: '/logs',                    element: <LogsPage /> },
+      { path: '*',                        element: <NotFoundPage /> },
+    ],
+  },
 ])

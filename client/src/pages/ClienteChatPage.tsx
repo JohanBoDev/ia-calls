@@ -1,24 +1,31 @@
-import { useParams } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { useClienteChatQuery } from '@/features/clientes/hooks/useClientesQuery'
-import { PageHeader } from '@/components/shared/PageHeader'
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner'
 import { formatDate } from '@/lib/utils'
 import { cn } from '@/lib/utils'
+import { ChevronLeft, Phone, MapPin, MessageSquare } from 'lucide-react'
 
-const RESULTADO_COLOR: Record<string, string> = {
-  completado:            'bg-green-500/10 text-green-400 border-green-500/20',
-  servicio_activo:       'bg-green-500/10 text-green-400 border-green-500/20',
-  buzon_de_voz:          'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
-  no_contesto:           'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
-  sin_respuesta:         'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
-  cliente_colgo:         'bg-orange-500/10 text-orange-400 border-orange-500/20',
-  cancelada_manualmente: 'bg-red-500/10 text-red-400 border-red-500/20',
-  error_tecnico:         'bg-red-500/10 text-red-400 border-red-500/20',
-  timeout_sesion:        'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
+const RESULTADO_STYLE: Record<string, { color: string; bg: string; border: string }> = {
+  completado:            { color: '#10b981', bg: 'rgba(16,185,129,0.08)',  border: 'rgba(16,185,129,0.2)'  },
+  servicio_activo:       { color: '#10b981', bg: 'rgba(16,185,129,0.08)',  border: 'rgba(16,185,129,0.2)'  },
+  buzon_de_voz:          { color: '#f59e0b', bg: 'rgba(245,158,11,0.08)', border: 'rgba(245,158,11,0.2)'  },
+  no_contesto:           { color: '#f59e0b', bg: 'rgba(245,158,11,0.08)', border: 'rgba(245,158,11,0.2)'  },
+  sin_respuesta:         { color: '#f59e0b', bg: 'rgba(245,158,11,0.08)', border: 'rgba(245,158,11,0.2)'  },
+  cliente_colgo:         { color: '#f97316', bg: 'rgba(249,115,22,0.08)', border: 'rgba(249,115,22,0.2)'  },
+  cancelada_manualmente: { color: '#ef4444', bg: 'rgba(239,68,68,0.08)',  border: 'rgba(239,68,68,0.2)'   },
+  error_tecnico:         { color: '#ef4444', bg: 'rgba(239,68,68,0.08)',  border: 'rgba(239,68,68,0.2)'   },
+  timeout_sesion:        { color: '#f59e0b', bg: 'rgba(245,158,11,0.08)', border: 'rgba(245,158,11,0.2)'  },
 }
 
 function resultadoLabel(r: string): string {
   return r.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+}
+
+function emptyMessage(resultado: string | undefined): string {
+  if (resultado === 'buzon_de_voz') return 'Llamada atendida por buzón de voz'
+  if (resultado === 'no_contesto' || resultado === 'timeout_sesion') return 'El cliente no contestó la llamada'
+  if (resultado === 'error_tecnico') return 'Error técnico al realizar la llamada'
+  return 'Sin mensajes registrados'
 }
 
 export default function ClienteChatPage() {
@@ -26,108 +33,239 @@ export default function ClienteChatPage() {
   const { data, isLoading } = useClienteChatQuery(numero_ticket)
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] p-8">
-      <div className="max-w-3xl mx-auto">
-        <PageHeader
-          title={data?.numero_ticket ?? 'Ticket'}
-          back={{ to: '/clientes', label: 'Tickets' }}
+    <div>
+      {/* Header */}
+      <div className="animate-fade-in" style={{ marginBottom: 28 }}>
+        <Link
+          to="/clientes"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
+            fontSize: 12,
+            color: 'var(--text-secondary)',
+            textDecoration: 'none',
+            marginBottom: 12,
+            fontWeight: 500,
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--accent)' }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-secondary)' }}
         >
+          <ChevronLeft size={14} />
+          Tickets
+        </Link>
+
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+          <div>
+            <p
+              className="mono"
+              style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.2em', marginBottom: 6 }}
+            >
+              HISTORIAL DE LLAMADAS
+            </p>
+            <h1
+              className="mono"
+              style={{ fontSize: 24, fontWeight: 600, color: 'var(--accent)', letterSpacing: '0.02em' }}
+            >
+              {data?.numero_ticket ?? numero_ticket}
+            </h1>
+          </div>
+
           {data && (
-            <span className="text-xs text-[var(--text-secondary)] font-mono">
-              {data.telefono}
-            </span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'flex-end', paddingTop: 4 }}>
+              <div
+                style={{ display: 'flex', alignItems: 'center', gap: 5, color: 'var(--text-secondary)', fontSize: 12 }}
+              >
+                <Phone size={12} />
+                <span className="mono">{data.telefono}</span>
+              </div>
+              <div
+                style={{ display: 'flex', alignItems: 'center', gap: 5, color: 'var(--text-secondary)', fontSize: 12 }}
+              >
+                <MapPin size={12} />
+                <span>{data.sector} — {data.municipio}</span>
+              </div>
+            </div>
           )}
-        </PageHeader>
+        </div>
+      </div>
 
-        {data && (
-          <p className="text-sm text-[var(--text-secondary)] -mt-6 mb-6">
-            {data.sector} — {data.municipio}
-          </p>
-        )}
+      {isLoading && <LoadingSpinner />}
 
-        {isLoading && <LoadingSpinner />}
+      {/* Calls */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        {data?.llamadas.map((llamada, i) => {
+          const res = llamada.resultado
+          const resStyle = res ? (RESULTADO_STYLE[res] ?? { color: 'var(--text-secondary)', bg: 'rgba(255,255,255,0.04)', border: 'var(--border)' }) : null
+          const mensajesFiltrados = llamada.mensajes.filter((m) => m.role !== 'system')
 
-        <div className="space-y-4">
-          {data?.llamadas.map((llamada, i) => (
+          return (
             <div
               key={llamada.llamada_id}
-              className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl overflow-hidden"
+              className={cn('card animate-fade-in')}
+              style={{ overflow: 'hidden' }}
             >
-              {/* Header */}
-              <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--border)]">
-                <span className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">
-                  Llamada #{(data?.llamadas.length ?? 0) - i}
-                </span>
-                <div className="flex items-center gap-3">
-                  {llamada.resultado && (
-                    <span className={cn(
-                      'text-xs border px-2.5 py-1 rounded-full font-medium',
-                      RESULTADO_COLOR[llamada.resultado] ?? 'bg-[var(--border)] text-[var(--text-secondary)] border-transparent'
-                    )}>
-                      {resultadoLabel(llamada.resultado)}
+              {/* Call header */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '12px 18px',
+                  borderBottom: '1px solid var(--border-subtle)',
+                  background: 'var(--bg-primary)',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div
+                    style={{
+                      width: 28,
+                      height: 28,
+                      borderRadius: 8,
+                      background: 'var(--accent-dim)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <MessageSquare size={13} color="var(--accent)" />
+                  </div>
+                  <span
+                    className="mono"
+                    style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-secondary)', letterSpacing: '0.12em' }}
+                  >
+                    LLAMADA #{(data?.llamadas.length ?? 0) - i}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  {res && resStyle && (
+                    <span
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 700,
+                        letterSpacing: '0.06em',
+                        textTransform: 'uppercase',
+                        color: resStyle.color,
+                        background: resStyle.bg,
+                        border: `1px solid ${resStyle.border}`,
+                        borderRadius: 20,
+                        padding: '3px 10px',
+                      }}
+                    >
+                      {resultadoLabel(res)}
                     </span>
                   )}
-                  <span className="text-xs text-[var(--text-muted)]">
+                  <span
+                    className="mono"
+                    style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.04em' }}
+                  >
                     {llamada.iniciada_en ? formatDate(llamada.iniciada_en) : '—'}
                   </span>
                 </div>
               </div>
 
-              {/* Mensajes */}
-              <div className="p-5 space-y-3">
-                {llamada.mensajes
-                  .filter((m) => m.role !== 'system')
-                  .map((msg, j) => (
-                    <div key={j} className={cn('flex', msg.role === 'assistant' ? 'justify-start' : 'justify-end')}>
-                      <div className={cn(
-                        'max-w-[80%] px-4 py-2.5 rounded-xl text-sm leading-relaxed',
-                        msg.role === 'assistant'
-                          ? 'bg-[var(--border)] text-[var(--text-primary)]'
-                          : 'bg-[var(--accent)] text-white',
-                      )}>
+              {/* Messages */}
+              <div style={{ padding: '18px 18px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {mensajesFiltrados.length === 0 ? (
+                  <p style={{ fontSize: 12, color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                    {emptyMessage(res ?? undefined)}
+                  </p>
+                ) : (
+                  mensajesFiltrados.map((msg, j) => (
+                    <div
+                      key={j}
+                      style={{
+                        display: 'flex',
+                        justifyContent: msg.role === 'assistant' ? 'flex-start' : 'flex-end',
+                      }}
+                    >
+                      <div
+                        style={{
+                          maxWidth: '78%',
+                          padding: '10px 14px',
+                          borderRadius: msg.role === 'assistant' ? '4px 14px 14px 14px' : '14px 4px 14px 14px',
+                          fontSize: 13,
+                          lineHeight: 1.5,
+                          ...(msg.role === 'assistant'
+                            ? {
+                                background: 'var(--bg-primary)',
+                                border: '1px solid var(--border)',
+                                color: 'var(--text-primary)',
+                              }
+                            : {
+                                background: 'var(--accent)',
+                                color: '#020c14',
+                                fontWeight: 500,
+                              }),
+                        }}
+                      >
                         {msg.content}
                       </div>
                     </div>
-                  ))}
-                {llamada.mensajes.filter((m) => m.role !== 'system').length === 0 && (
-                  <p className="text-xs text-[var(--text-muted)] italic">
-                    {llamada.resultado === 'buzon_de_voz' && 'Llamada atendida por buzón de voz'}
-                    {(llamada.resultado === 'no_contesto' || llamada.resultado === 'timeout_sesion') && 'El cliente no contestó la llamada'}
-                    {llamada.resultado === 'error_tecnico' && 'Error técnico al realizar la llamada'}
-                    {!['buzon_de_voz','no_contesto','timeout_sesion','error_tecnico'].includes(llamada.resultado ?? '') && 'Sin mensajes registrados'}
-                  </p>
+                  ))
                 )}
               </div>
 
-              {/* Respuestas estructuradas */}
+              {/* Captured responses */}
               {llamada.respuestas.length > 0 && (
-                <div className="border-t border-[var(--border)] px-5 py-3 bg-[var(--bg-primary)]">
-                  <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-2">
+                <div
+                  style={{
+                    borderTop: '1px solid var(--border-subtle)',
+                    padding: '12px 18px',
+                    background: 'var(--bg-primary)',
+                  }}
+                >
+                  <p
+                    style={{
+                      fontSize: 9,
+                      fontWeight: 600,
+                      letterSpacing: '0.2em',
+                      textTransform: 'uppercase',
+                      color: 'var(--text-muted)',
+                      marginBottom: 10,
+                    }}
+                  >
                     Respuestas capturadas
                   </p>
-                  <div className="flex flex-wrap gap-2">
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                     {llamada.respuestas.map((r, k) => (
-                      <span
+                      <div
                         key={k}
-                        className="text-xs border border-[var(--border)] px-3 py-1 rounded-full flex items-center gap-1.5 text-[var(--text-secondary)]"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 6,
+                          fontSize: 11,
+                          border: '1px solid var(--border)',
+                          borderRadius: 20,
+                          padding: '4px 12px',
+                          background: 'var(--bg-card)',
+                        }}
                       >
-                        <span className="opacity-60">{r.pregunta.split('¿')[1]?.split('?')[0] ?? r.pregunta}:</span>
-                        <span className="font-semibold text-[var(--text-primary)]">{r.respuesta}</span>
-                      </span>
+                        <span style={{ color: 'var(--text-secondary)' }}>
+                          {r.pregunta.split('¿')[1]?.split('?')[0] ?? r.pregunta}:
+                        </span>
+                        <span className="mono" style={{ fontWeight: 600, color: 'var(--accent)', fontSize: 11 }}>
+                          {r.respuesta}
+                        </span>
+                      </div>
                     ))}
                   </div>
                 </div>
               )}
             </div>
-          ))}
-        </div>
-
-        {data?.llamadas.length === 0 && (
-          <p className="text-center py-12 text-[var(--text-muted)]">
-            Este ticket no tiene llamadas registradas
-          </p>
-        )}
+          )
+        })}
       </div>
+
+      {data?.llamadas.length === 0 && (
+        <div className="card" style={{ padding: '60px 40px', textAlign: 'center' }}>
+          <MessageSquare size={32} color="var(--text-muted)" style={{ margin: '0 auto 14px' }} />
+          <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-secondary)' }}>
+            Sin llamadas registradas
+          </p>
+        </div>
+      )}
     </div>
   )
 }

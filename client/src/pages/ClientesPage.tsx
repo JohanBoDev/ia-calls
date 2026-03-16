@@ -2,28 +2,17 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useClientesQuery, useEliminarTicketsMutation } from '@/features/clientes/hooks/useClientesQuery'
 import { useLlamarSeleccionMutation } from '@/features/llamadas/hooks/useLlamadasMutation'
-import { PageHeader } from '@/components/shared/PageHeader'
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner'
 import { formatDate } from '@/lib/utils'
-import { MessageSquare, Phone, PhoneCall, Plus, Trash2, X } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { MessageSquare, Phone, PhoneCall, Plus, Trash2, X, Users } from 'lucide-react'
 
-const ESTADO_BADGE: Record<string, string> = {
-  pendiente:            'bg-gray-500/10 text-gray-400 border-gray-500/20',
-  llamando:             'bg-blue-500/10 text-blue-400 border-blue-500/20',
-  no_contesto:          'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
-  reintento_pendiente:  'bg-orange-500/10 text-orange-400 border-orange-500/20',
-  completado:           'bg-green-500/10 text-green-400 border-green-500/20',
-  fallido:              'bg-red-500/10 text-red-400 border-red-500/20',
-}
-
-const ESTADO_LABEL: Record<string, string> = {
-  pendiente:            'Pendiente',
-  llamando:             'Llamando',
-  no_contesto:          'No contestó',
-  reintento_pendiente:  'Reintento',
-  completado:           'Completado',
-  fallido:              'Fallido',
+const ESTADO_STYLE: Record<string, { color: string; bg: string; border: string; label: string }> = {
+  pendiente:           { color: 'var(--text-secondary)', bg: 'rgba(255,255,255,0.04)', border: 'var(--border)',              label: 'Pendiente'  },
+  llamando:            { color: '#22d3ee',               bg: 'rgba(34,211,238,0.08)', border: 'rgba(34,211,238,0.2)',       label: 'Llamando'   },
+  no_contesto:         { color: '#f59e0b',               bg: 'rgba(245,158,11,0.08)', border: 'rgba(245,158,11,0.2)',       label: 'No contestó'},
+  reintento_pendiente: { color: '#f97316',               bg: 'rgba(249,115,22,0.08)', border: 'rgba(249,115,22,0.2)',       label: 'Reintento'  },
+  completado:          { color: '#10b981',               bg: 'rgba(16,185,129,0.08)', border: 'rgba(16,185,129,0.2)',       label: 'Completado' },
+  fallido:             { color: '#ef4444',               bg: 'rgba(239,68,68,0.08)',  border: 'rgba(239,68,68,0.2)',        label: 'Fallido'    },
 }
 
 function tiempoRestante(reintento_en: string | null): string {
@@ -34,6 +23,29 @@ function tiempoRestante(reintento_en: string | null): string {
   const h = Math.floor(m / 60)
   if (h > 0) return `↻ ${h}h ${m % 60}m`
   return `↻ ${m}m`
+}
+
+function EstadoBadge({ estado, reintento_en }: { estado: string; reintento_en?: string | null }) {
+  const s = ESTADO_STYLE[estado] ?? ESTADO_STYLE.pendiente
+  const label = estado === 'reintento_pendiente' ? tiempoRestante(reintento_en ?? null) : s.label
+  return (
+    <span
+      style={{
+        fontSize: 10,
+        fontWeight: 700,
+        letterSpacing: '0.06em',
+        textTransform: 'uppercase',
+        color: s.color,
+        background: s.bg,
+        border: `1px solid ${s.border}`,
+        borderRadius: 20,
+        padding: '3px 9px',
+        whiteSpace: 'nowrap',
+      }}
+    >
+      {label}
+    </span>
+  )
 }
 
 export default function ClientesPage() {
@@ -51,161 +63,249 @@ export default function ClientesPage() {
   }
 
   const toggleTodos = () => {
-    if (seleccion.size === tickets.length) {
-      setSeleccion(new Set())
-    } else {
-      setSeleccion(new Set(tickets.map((t) => t.ticket_id)))
-    }
+    setSeleccion(seleccion.size === tickets.length ? new Set() : new Set(tickets.map((t) => t.ticket_id)))
   }
-
-  const llamarUno = (id: number) => llamar([id])
-  const llamarSeleccionados = () => llamar(Array.from(seleccion))
 
   const todosSeleccionados = tickets.length > 0 && seleccion.size === tickets.length
   const algunoSeleccionado = seleccion.size > 0
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] p-8">
-      <div className="max-w-5xl mx-auto">
-        <PageHeader title="Tickets" back={{ to: '/', label: 'Dashboard' }}>
-          <span className="text-sm text-[var(--text-secondary)]">
+    <div>
+      {/* Header */}
+      <div
+        className="animate-fade-in"
+        style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 28 }}
+      >
+        <div>
+          <p
+            className="mono"
+            style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.2em', marginBottom: 6 }}
+          >
+            GESTIÓN
+          </p>
+          <h1
+            style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.01em' }}
+          >
+            Tickets
+          </h1>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, paddingTop: 4 }}>
+          <span
+            className="mono"
+            style={{ fontSize: 11, color: 'var(--text-muted)', letterSpacing: '0.06em' }}
+          >
             {tickets.length} registros
           </span>
           <Link
             to="/clientes/nuevo"
-            className="flex items-center gap-2 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
+            className="btn-accent"
+            style={{ padding: '9px 18px', fontSize: 12, textDecoration: 'none' }}
           >
-            <Plus className="w-4 h-4" />
+            <Plus size={14} strokeWidth={2.5} />
             Nuevo ticket
           </Link>
-        </PageHeader>
+        </div>
+      </div>
 
-        {isLoading ? (
-          <LoadingSpinner />
-        ) : (
-          <>
-            <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl overflow-hidden">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-[var(--border)]">
-                    <th className="px-4 py-3 w-10">
+      {isLoading ? (
+        <LoadingSpinner />
+      ) : (
+        <>
+          <div className="card animate-fade-in" style={{ overflow: 'hidden' }}>
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th style={{ width: 44, paddingLeft: 18 }}>
+                    <input
+                      type="checkbox"
+                      checked={todosSeleccionados}
+                      onChange={toggleTodos}
+                      style={{ width: 14, height: 14, accentColor: 'var(--accent)', cursor: 'pointer' }}
+                    />
+                  </th>
+                  {['Ticket', 'Teléfono', 'Sector', 'Municipio', 'Estado', 'Última llamada', ''].map((h) => (
+                    <th key={h}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {tickets.map((t) => (
+                  <tr
+                    key={t.ticket_id}
+                    className={seleccion.has(t.ticket_id) ? 'selected' : ''}
+                    style={{ cursor: 'default' }}
+                  >
+                    <td style={{ paddingLeft: 18, paddingRight: 8 }}>
                       <input
                         type="checkbox"
-                        checked={todosSeleccionados}
-                        onChange={toggleTodos}
-                        className="w-4 h-4 accent-[var(--accent)] cursor-pointer"
+                        checked={seleccion.has(t.ticket_id)}
+                        onChange={() => toggleOne(t.ticket_id)}
+                        style={{ width: 14, height: 14, accentColor: 'var(--accent)', cursor: 'pointer' }}
                       />
-                    </th>
-                    {['Ticket', 'Teléfono', 'Sector', 'Municipio', 'Estado', 'Última llamada', ''].map((h) => (
-                      <th
-                        key={h}
-                        className="px-5 py-3 text-left text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider"
-                      >
-                        {h}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[var(--border)]">
-                  {tickets.map((t) => (
-                    <tr
-                      key={t.ticket_id}
-                      className={cn(
-                        'hover:bg-[var(--bg-card-hover)] transition-colors',
-                        seleccion.has(t.ticket_id) && 'bg-[var(--accent)]/5',
-                      )}
-                    >
-                      <td className="px-4 py-4">
-                        <input
-                          type="checkbox"
-                          checked={seleccion.has(t.ticket_id)}
-                          onChange={() => toggleOne(t.ticket_id)}
-                          className="w-4 h-4 accent-[var(--accent)] cursor-pointer"
-                        />
-                      </td>
-                      <td className="px-5 py-4 font-semibold text-[var(--text-primary)] font-mono text-xs">
+                    </td>
+                    <td>
+                      <span className="mono" style={{ fontSize: 12, fontWeight: 600, color: 'var(--accent)' }}>
                         {t.numero_ticket}
-                      </td>
-                      <td className="px-5 py-4 text-[var(--text-secondary)] font-mono text-xs">
+                      </span>
+                    </td>
+                    <td>
+                      <span className="mono" style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
                         {t.telefono}
-                      </td>
-                      <td className="px-5 py-4 text-[var(--text-secondary)]">{t.sector || '—'}</td>
-                      <td className="px-5 py-4 text-[var(--text-secondary)]">{t.municipio}</td>
-                      <td className="px-5 py-4">
-                        <span className={cn('text-xs border px-2.5 py-1 rounded-full font-medium', ESTADO_BADGE[t.estado] ?? ESTADO_BADGE.pendiente)}>
-                          {t.estado === 'reintento_pendiente' ? tiempoRestante(t.reintento_en) : (ESTADO_LABEL[t.estado] ?? t.estado)}
-                        </span>
-                      </td>
-                      <td className="px-5 py-4 text-[var(--text-secondary)] text-xs">
+                      </span>
+                    </td>
+                    <td style={{ color: 'var(--text-secondary)', fontSize: 12 }}>{t.sector || '—'}</td>
+                    <td style={{ color: 'var(--text-secondary)', fontSize: 12 }}>{t.municipio}</td>
+                    <td>
+                      <EstadoBadge estado={t.estado} reintento_en={t.reintento_en} />
+                    </td>
+                    <td>
+                      <span className="mono" style={{ fontSize: 11, color: 'var(--text-muted)' }}>
                         {t.ultima_llamada ? formatDate(t.ultima_llamada) : '—'}
-                      </td>
-                      <td className="px-5 py-4">
-                        <div className="flex items-center justify-end gap-3">
-                          <button
-                            onClick={() => llamarUno(t.ticket_id)}
-                            disabled={llamando}
-                            title="Llamar ahora"
-                            className="flex items-center gap-1 text-xs text-green-400 hover:text-green-300 disabled:opacity-40 transition-colors"
-                          >
-                            <Phone className="w-3.5 h-3.5" />
-                            Llamar
-                          </button>
-                          <Link
-                            to={`/clientes/${t.numero_ticket}`}
-                            className="flex items-center gap-1 text-xs text-[var(--accent)] hover:underline font-medium"
-                          >
-                            <MessageSquare className="w-3.5 h-3.5" />
-                            Chat
-                          </Link>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              {tickets.length === 0 && (
-                <p className="text-center py-12 text-[var(--text-muted)]">Sin tickets registrados aún</p>
-              )}
-            </div>
-
-            {/* Barra de acción flotante */}
-            {algunoSeleccionado && (
-              <div className="fixed bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-4 bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl shadow-2xl px-6 py-3">
-                <span className="text-sm text-[var(--text-secondary)]">
-                  <span className="font-bold text-[var(--text-primary)]">{seleccion.size}</span> seleccionado{seleccion.size !== 1 ? 's' : ''}
-                </span>
-                <div className="w-px h-5 bg-[var(--border)]" />
-                <button
-                  onClick={llamarSeleccionados}
-                  disabled={llamando || eliminando}
-                  className="flex items-center gap-2 text-sm font-semibold bg-[var(--accent)] hover:bg-[var(--accent-hover)] disabled:opacity-40 text-white px-4 py-2 rounded-xl transition-colors"
-                >
-                  <PhoneCall className="w-4 h-4" />
-                  {llamando ? 'Llamando...' : `Llamar ${seleccion.size}`}
-                </button>
-                <button
-                  onClick={() => {
-                    if (confirm(`¿Eliminar ${seleccion.size} ticket${seleccion.size !== 1 ? 's' : ''}?`)) {
-                      eliminar(Array.from(seleccion), { onSuccess: () => setSeleccion(new Set()) })
-                    }
-                  }}
-                  disabled={llamando || eliminando}
-                  className="flex items-center gap-2 text-sm font-semibold bg-red-500/10 hover:bg-red-500/20 disabled:opacity-40 text-red-400 border border-red-500/20 px-4 py-2 rounded-xl transition-colors"
-                >
-                  <Trash2 className="w-4 h-4" />
-                  {eliminando ? 'Eliminando...' : 'Eliminar'}
-                </button>
-                <button
-                  onClick={() => setSeleccion(new Set())}
-                  className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
-                >
-                  <X className="w-4 h-4" />
-                </button>
+                      </span>
+                    </td>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 14, justifyContent: 'flex-end' }}>
+                        <button
+                          onClick={() => llamar([t.ticket_id])}
+                          disabled={llamando}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 4,
+                            fontSize: 11,
+                            fontWeight: 600,
+                            color: 'var(--success)',
+                            background: 'transparent',
+                            border: 'none',
+                            cursor: llamando ? 'not-allowed' : 'pointer',
+                            opacity: llamando ? 0.4 : 1,
+                            fontFamily: "'Syne', sans-serif",
+                          }}
+                        >
+                          <Phone size={12} />
+                          Llamar
+                        </button>
+                        <Link
+                          to={`/clientes/${t.numero_ticket}`}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 4,
+                            fontSize: 11,
+                            fontWeight: 600,
+                            color: 'var(--accent)',
+                            textDecoration: 'none',
+                          }}
+                        >
+                          <MessageSquare size={12} />
+                          Chat
+                        </Link>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {tickets.length === 0 && (
+              <div style={{ textAlign: 'center', padding: '60px 40px' }}>
+                <Users size={32} color="var(--text-muted)" style={{ margin: '0 auto 14px' }} />
+                <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 4 }}>
+                  Sin tickets registrados
+                </p>
+                <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                  Crea el primer ticket con el botón "Nuevo ticket"
+                </p>
               </div>
             )}
-          </>
-        )}
-      </div>
+          </div>
+
+          {/* Floating action bar */}
+          {algunoSeleccionado && (
+            <div
+              style={{
+                position: 'fixed',
+                bottom: 28,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border)',
+                borderRadius: 16,
+                padding: '10px 18px',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+                backdropFilter: 'blur(12px)',
+                zIndex: 50,
+              }}
+            >
+              <span
+                className="mono"
+                style={{ fontSize: 12, color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}
+              >
+                <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{seleccion.size}</span>{' '}
+                seleccionado{seleccion.size !== 1 ? 's' : ''}
+              </span>
+
+              <div style={{ width: 1, height: 20, background: 'var(--border)' }} />
+
+              <button
+                onClick={() => llamar(Array.from(seleccion))}
+                disabled={llamando || eliminando}
+                className="btn-accent"
+                style={{ padding: '7px 16px', fontSize: 12 }}
+              >
+                <PhoneCall size={14} />
+                {llamando ? 'Llamando...' : `Llamar ${seleccion.size}`}
+              </button>
+
+              <button
+                onClick={() => {
+                  if (confirm(`¿Eliminar ${seleccion.size} ticket${seleccion.size !== 1 ? 's' : ''}?`)) {
+                    eliminar(Array.from(seleccion), { onSuccess: () => setSeleccion(new Set()) })
+                  }
+                }}
+                disabled={llamando || eliminando}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '7px 16px',
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: 'var(--error)',
+                  background: 'rgba(239,68,68,0.08)',
+                  border: '1px solid rgba(239,68,68,0.2)',
+                  borderRadius: 9,
+                  cursor: llamando || eliminando ? 'not-allowed' : 'pointer',
+                  opacity: llamando || eliminando ? 0.4 : 1,
+                  fontFamily: "'Syne', sans-serif",
+                }}
+              >
+                <Trash2 size={14} />
+                {eliminando ? 'Eliminando...' : 'Eliminar'}
+              </button>
+
+              <button
+                onClick={() => setSeleccion(new Set())}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: 'var(--text-secondary)',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--text-primary)' }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-secondary)' }}
+              >
+                <X size={16} />
+              </button>
+            </div>
+          )}
+        </>
+      )}
     </div>
   )
 }

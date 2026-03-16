@@ -1,22 +1,41 @@
-import { cn } from '@/lib/utils'
-
 interface Props {
   status: 'ok' | 'error' | 'degraded' | 'loading'
   label?: string
 }
 
 const config = {
-  ok:       { dot: 'bg-green-400',  text: 'text-green-400',  label: 'Operativo' },
-  degraded: { dot: 'bg-yellow-400', text: 'text-yellow-400', label: 'Degradado' },
-  error:    { dot: 'bg-red-400',    text: 'text-red-400',    label: 'Error'      },
-  loading:  { dot: 'bg-gray-500',   text: 'text-gray-400',   label: '...'        },
+  ok:       { dot: 'var(--success)', text: 'var(--success)', label: 'Operativo',  pulse: true  },
+  degraded: { dot: 'var(--warning)', text: 'var(--warning)', label: 'Degradado',  pulse: false },
+  error:    { dot: 'var(--error)',   text: 'var(--error)',   label: 'Error',       pulse: false },
+  loading:  { dot: 'var(--text-muted)', text: 'var(--text-muted)', label: '...',  pulse: false },
 }
 
 export function StatusBadge({ status, label }: Props) {
   const c = config[status]
   return (
-    <span className={cn('flex items-center gap-1.5 text-xs font-semibold', c.text)}>
-      <span className={cn('w-2 h-2 rounded-full', c.dot, status === 'ok' && 'animate-pulse')} />
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 6,
+        fontSize: 11,
+        fontWeight: 600,
+        color: c.text,
+        letterSpacing: '0.04em',
+      }}
+    >
+      <span
+        style={{
+          width: 7,
+          height: 7,
+          borderRadius: '50%',
+          background: c.dot,
+          boxShadow: c.pulse ? `0 0 6px ${c.dot}` : 'none',
+          display: 'inline-block',
+          flexShrink: 0,
+        }}
+        className={c.pulse ? 'animate-live' : ''}
+      />
       {label ?? c.label}
     </span>
   )
