@@ -29,11 +29,11 @@ const ESTADO_LABEL: Record<string, string> = {
 function tiempoRestante(reintento_en: string | null): string {
   if (!reintento_en) return 'Reintento'
   const diff = new Date(reintento_en).getTime() - Date.now()
-  if (diff <= 0) return 'Reintentando...'
+  if (diff <= 0) return 'Reintentando'
   const m = Math.floor(diff / 60000)
   const h = Math.floor(m / 60)
-  if (h > 0) return `Reintentar en ${h}h ${m % 60}m`
-  return `Reintentar en ${m}m`
+  if (h > 0) return `↻ ${h}h ${m % 60}m`
+  return `↻ ${m}m`
 }
 
 export default function ClientesPage() {
