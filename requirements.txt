@@ -9,3 +9,4 @@ sqlalchemy[asyncio]
 asyncpg
 alembic
 azure-cognitiveservices-speech
+python-multipart
