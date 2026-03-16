@@ -5,7 +5,7 @@ import { useLlamarSeleccionMutation } from '@/features/llamadas/hooks/useLlamada
 import { PageHeader } from '@/components/shared/PageHeader'
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner'
 import { formatDate } from '@/lib/utils'
-import { MessageSquare, Phone, PhoneCall, X } from 'lucide-react'
+import { MessageSquare, Phone, PhoneCall, Plus, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const ESTADO_BADGE: Record<string, string> = {
@@ -60,6 +60,13 @@ export default function ClientesPage() {
           <span className="text-sm text-[var(--text-secondary)]">
             {tickets.length} registros
           </span>
+          <Link
+            to="/clientes/nuevo"
+            className="flex items-center gap-2 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            Nuevo ticket
+          </Link>
         </PageHeader>
 
         {isLoading ? (

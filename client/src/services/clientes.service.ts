@@ -42,6 +42,18 @@ export interface TicketChat {
   llamadas:      Llamada[]
 }
 
+export interface TicketIn {
+  numero_ticket: string
+  telefono:      string
+  sector:        string
+  municipio:     string
+}
+
+export async function importarTickets(tickets: TicketIn[]): Promise<{ creados: number; duplicados: number }> {
+  const { data } = await api.post('/api/tickets', { tickets })
+  return data
+}
+
 export async function getClientes(): Promise<ClienteResumen[]> {
   const { data } = await api.get('/api/clientes')
   return data

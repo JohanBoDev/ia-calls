@@ -37,6 +37,29 @@ async def actualizar_estado_ticket(ticket_id: int, estado: EstadoTicket) -> None
             await session.commit()
 
 
+async def crear_tickets(tickets: list) -> dict:
+    """Inserta tickets nuevos; ignora duplicados por numero_ticket."""
+    from sqlalchemy.dialects.postgresql import insert as pg_insert
+    creados = 0
+    duplicados = 0
+    async with AsyncSessionLocal() as session:
+        for t in tickets:
+            stmt = pg_insert(Ticket).values(
+                numero_ticket=t.numero_ticket,
+                telefono=t.telefono,
+                sector=t.sector,
+                municipio=t.municipio,
+                estado=EstadoTicket.pendiente,
+            ).on_conflict_do_nothing(index_elements=["numero_ticket"])
+            result = await session.execute(stmt)
+            if result.rowcount:
+                creados += 1
+            else:
+                duplicados += 1
+        await session.commit()
+    return {"creados": creados, "duplicados": duplicados}
+
+
 # ── llamadas ───────────────────────────────────────────────────────────────────
 
 async def crear_llamada(ticket_id: int, call_sid: str) -> int:
