@@ -25,7 +25,7 @@ def _synthesize(ssml: str) -> bytes:
 def text_to_speech(text: str) -> bytes:
     ssml = f"""<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="es-CO">
   <voice name="{settings.AZURE_VOICE_NAME}">
-    <prosody rate="+30%">{text}</prosody>
+    <prosody rate="+20%">{text}</prosody>
   </voice>
 </speak>"""
     return _synthesize(ssml)
@@ -46,7 +46,7 @@ def text_to_speech_dtmf(text: str, opcion_1: str, opcion_2: str, opcion_3: str =
 
     ssml = f"""<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="es-CO">
   <voice name="{settings.AZURE_VOICE_NAME}">
-    <prosody rate="+30%">{text} {opciones}</prosody>
+    <prosody rate="+20%">{text} {opciones}</prosody>
   </voice>
 </speak>"""
     return _synthesize(ssml)
