@@ -152,12 +152,16 @@ async def manejar_call_status(call_sid: str, status: str) -> None:
     log.info("Estado de llamada %s: %s", call_sid, status)
 
     if status == "completed" and not session.terminada:
+        # Si el cliente nunca interactuó (paso_actual sigue en 2), no fue colgar sino no contestar
+        hubo_interaccion = session.paso_actual > 2 or len(session.respuestas) > 0
+        resultado     = "cliente_colgo"   if hubo_interaccion else "no_contesto"
+        estado_ticket = EstadoTicket.completado if hubo_interaccion else EstadoTicket.no_contesto
         if session.llamada_id:
             await finalizar_llamada(
                 llamada_id=session.llamada_id,
                 ticket_id=session.ticket_id,
-                resultado="cliente_colgo",
-                estado_ticket=EstadoTicket.completado,
+                resultado=resultado,
+                estado_ticket=estado_ticket,
                 sector=session.sector,
                 tipo_afectacion=session.tipo_afectacion,
                 historial=session.historial,
