@@ -15,6 +15,14 @@ export default function NuevoTicketPage() {
   const [filas, setFilas] = useState<TicketIn[]>([{ ...EMPTY }])
 
   function actualizar(idx: number, campo: keyof TicketIn, valor: string) {
+    if (campo === 'telefono') {
+      const digits = valor.replace(/\D/g, '')
+      if (!valor.startsWith('+')) {
+        valor = '+57' + digits
+      } else {
+        valor = '+' + digits
+      }
+    }
     setFilas((prev) => prev.map((f, i) => (i === idx ? { ...f, [campo]: valor } : f)))
   }
 
@@ -34,12 +42,15 @@ export default function NuevoTicketPage() {
       const wb = XLSX.read(ev.target?.result, { type: 'binary' })
       const ws = wb.Sheets[wb.SheetNames[0]]
       const rows = XLSX.utils.sheet_to_json<Record<string, string>>(ws, { defval: '' })
-      const parsed: TicketIn[] = rows.map((r) => ({
-        numero_ticket: String(r['numero_ticket'] ?? r['Ticket'] ?? r['ticket'] ?? '').trim(),
-        telefono:      String(r['telefono']      ?? r['Telefono'] ?? r['phone'] ?? '').trim(),
-        sector:        String(r['sector']        ?? r['Sector']   ?? r['lugar'] ?? '').trim(),
-        municipio:     String(r['municipio']     ?? r['Municipio'] ?? r['ciudad'] ?? '').trim(),
-      })).filter((t) => t.numero_ticket && t.telefono)
+      const parsed: TicketIn[] = rows.map((r) => {
+        const tel = String(r['telefono'] ?? r['Telefono'] ?? r['phone'] ?? '').trim().replace(/\D/g, '')
+        return {
+          numero_ticket: String(r['numero_ticket'] ?? r['Ticket'] ?? r['ticket'] ?? '').trim(),
+          telefono:      tel ? (tel.startsWith('57') ? '+' + tel : '+57' + tel) : '',
+          sector:        String(r['sector']    ?? r['Sector']   ?? r['lugar']   ?? '').trim(),
+          municipio:     String(r['municipio'] ?? r['Municipio'] ?? r['ciudad'] ?? '').trim(),
+        }
+      }).filter((t) => t.numero_ticket && t.telefono)
       if (!parsed.length) {
         toast.error('No se encontraron filas válidas en el Excel')
         return

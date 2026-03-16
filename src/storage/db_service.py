@@ -37,6 +37,18 @@ async def actualizar_estado_ticket(ticket_id: int, estado: EstadoTicket) -> None
             await session.commit()
 
 
+async def eliminar_tickets(ticket_ids: list[int]) -> dict:
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(
+            select(Ticket).where(Ticket.id.in_(ticket_ids))
+        )
+        tickets = result.scalars().all()
+        for t in tickets:
+            await session.delete(t)
+        await session.commit()
+    return {"eliminados": len(tickets)}
+
+
 async def crear_tickets(tickets: list) -> dict:
     """Inserta tickets nuevos; ignora duplicados por numero_ticket."""
     from sqlalchemy.dialects.postgresql import insert as pg_insert

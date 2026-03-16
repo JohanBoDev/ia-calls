@@ -54,6 +54,11 @@ export async function importarTickets(tickets: TicketIn[]): Promise<{ creados: n
   return data
 }
 
+export async function eliminarTickets(ticket_ids: number[]): Promise<{ eliminados: number }> {
+  const { data } = await api.delete('/api/tickets', { data: { ticket_ids } })
+  return data
+}
+
 export async function getClientes(): Promise<ClienteResumen[]> {
   const { data } = await api.get('/api/clientes')
   return data

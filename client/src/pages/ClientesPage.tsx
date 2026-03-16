@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useClientesQuery } from '@/features/clientes/hooks/useClientesQuery'
+import { useClientesQuery, useEliminarTicketsMutation } from '@/features/clientes/hooks/useClientesQuery'
 import { useLlamarSeleccionMutation } from '@/features/llamadas/hooks/useLlamadasMutation'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner'
 import { formatDate } from '@/lib/utils'
-import { MessageSquare, Phone, PhoneCall, Plus, X } from 'lucide-react'
+import { MessageSquare, Phone, PhoneCall, Plus, Trash2, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const ESTADO_BADGE: Record<string, string> = {
@@ -30,6 +30,7 @@ export default function ClientesPage() {
   const { data: tickets = [], isLoading } = useClientesQuery()
   const [seleccion, setSeleccion] = useState<Set<number>>(new Set())
   const { mutate: llamar, isPending: llamando } = useLlamarSeleccionMutation(() => setSeleccion(new Set()))
+  const { mutate: eliminar, isPending: eliminando } = useEliminarTicketsMutation()
 
   const toggleOne = (id: number) => {
     setSeleccion((prev) => {
@@ -166,11 +167,23 @@ export default function ClientesPage() {
                 <div className="w-px h-5 bg-[var(--border)]" />
                 <button
                   onClick={llamarSeleccionados}
-                  disabled={llamando}
+                  disabled={llamando || eliminando}
                   className="flex items-center gap-2 text-sm font-semibold bg-[var(--accent)] hover:bg-[var(--accent-hover)] disabled:opacity-40 text-white px-4 py-2 rounded-xl transition-colors"
                 >
                   <PhoneCall className="w-4 h-4" />
                   {llamando ? 'Llamando...' : `Llamar ${seleccion.size}`}
+                </button>
+                <button
+                  onClick={() => {
+                    if (confirm(`¿Eliminar ${seleccion.size} ticket${seleccion.size !== 1 ? 's' : ''}?`)) {
+                      eliminar(Array.from(seleccion), { onSuccess: () => setSeleccion(new Set()) })
+                    }
+                  }}
+                  disabled={llamando || eliminando}
+                  className="flex items-center gap-2 text-sm font-semibold bg-red-500/10 hover:bg-red-500/20 disabled:opacity-40 text-red-400 border border-red-500/20 px-4 py-2 rounded-xl transition-colors"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  {eliminando ? 'Eliminando...' : 'Eliminar'}
                 </button>
                 <button
                   onClick={() => setSeleccion(new Set())}

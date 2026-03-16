@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Response
 from pydantic import BaseModel
 
-from storage.db_service import get_tickets_con_ultima_llamada, get_chat_ticket, crear_tickets
+from storage.db_service import get_tickets_con_ultima_llamada, get_chat_ticket, crear_tickets, eliminar_tickets
 from logger import get_logger
 
 log = get_logger("clients_router")
@@ -19,6 +19,10 @@ class TicketsImportBody(BaseModel):
     tickets: list[TicketIn]
 
 
+class TicketsEliminarBody(BaseModel):
+    ticket_ids: list[int]
+
+
 @router.get("/clientes")
 async def api_clientes():
     return await get_tickets_con_ultima_llamada()
@@ -26,8 +30,12 @@ async def api_clientes():
 
 @router.post("/tickets")
 async def api_crear_tickets(body: TicketsImportBody):
-    resultado = await crear_tickets(body.tickets)
-    return resultado
+    return await crear_tickets(body.tickets)
+
+
+@router.delete("/tickets")
+async def api_eliminar_tickets(body: TicketsEliminarBody):
+    return await eliminar_tickets(body.ticket_ids)
 
 
 @router.get("/chat/{numero_ticket}")

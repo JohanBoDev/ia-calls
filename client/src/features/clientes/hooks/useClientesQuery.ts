@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { getClientes, getClienteChat, importarTickets, type TicketIn } from '@/services/clientes.service'
+import { getClientes, getClienteChat, importarTickets, eliminarTickets, type TicketIn } from '@/services/clientes.service'
 
 export const CLIENTES_KEY = ['clientes'] as const
 
@@ -7,6 +7,14 @@ export function useClientesQuery() {
   return useQuery({
     queryKey: CLIENTES_KEY,
     queryFn: getClientes,
+  })
+}
+
+export function useEliminarTicketsMutation() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (ids: number[]) => eliminarTickets(ids),
+    onSuccess: () => qc.invalidateQueries({ queryKey: CLIENTES_KEY }),
   })
 }
 
