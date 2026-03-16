@@ -11,6 +11,7 @@ def hacer_llamada(telefono: str) -> str:
         url=f"{settings.BASE_URL}/twiml",
         status_callback=f"{settings.BASE_URL}/call-status",
         status_callback_method="POST",
+        status_callback_event=["initiated", "ringing", "answered", "completed"],
         machine_detection="Enable",
         async_amd=True,
         async_amd_status_callback=f"{settings.BASE_URL}/amd-status",

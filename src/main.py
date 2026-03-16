@@ -1,3 +1,4 @@
+import asyncio
 from contextlib import asynccontextmanager
 
 import uvicorn
@@ -5,12 +6,14 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from services.audio_service import pregenerar_audios
+from services.call_service import limpiar_sesiones_viejas
 from routers import calls, stream, clients, health, sesiones, stats, logs
 
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     await pregenerar_audios()
+    asyncio.create_task(limpiar_sesiones_viejas())
     yield
 
 

@@ -43,8 +43,13 @@ aws s3 sync dist s3://calls-frontend-enel --delete
 
 4. Abre el frontend y verifica:
 ```
-http://calls-frontend-enel.s3-website.us-east-2.amazonaws.com
+https://dnkwb11cb5641.cloudfront.net
 ```
+
+> CloudFront puede tener caché. Si los cambios no se ven, invalidar:
+> ```bash
+> aws cloudfront create-invalidation --distribution-id <ID> --paths "/*"
+> ```
 
 ---
 

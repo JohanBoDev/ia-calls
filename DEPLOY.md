@@ -180,7 +180,23 @@ sudo systemctl start enel-calls
 
 ---
 
-## 6 — Twilio — Webhooks
+## 6 — CloudFront (Frontend HTTPS)
+
+1. Ir a CloudFront → **Create distribution**
+2. **Distribution name**: `enel-calls-frontend`
+3. **Origin type**: Amazon S3
+4. **S3 origin**: `calls-frontend-enel.s3-website.us-east-2.amazonaws.com`
+5. **Protocol**: HTTP only (S3 website hosting no soporta HTTPS)
+6. **WAF**: Do not enable security protections (cuesta $14/mes)
+7. Click **Create distribution**
+8. Esperar ~5 min a que el status pase a **Enabled**
+9. El dominio asignado es: `dnkwb11cb5641.cloudfront.net`
+
+> Si CloudFront queda con Protocol HTTPS only, editar el origen y cambiarlo a HTTP only.
+
+---
+
+## 7 — Twilio — Webhooks
 
 En Twilio → Phone Numbers → tu número → Configure:
 

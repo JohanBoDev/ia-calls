@@ -205,6 +205,22 @@ async def manejar_call_status(call_sid: str, status: str) -> None:
                 sessions.pop(call_sid, None)
 
 
+async def limpiar_sesiones_viejas() -> None:
+    """Task periódico que elimina sesiones que superaron SESSION_TIMEOUT."""
+    from datetime import datetime, timezone
+    while True:
+        await asyncio.sleep(60)
+        ahora = datetime.now(timezone.utc)
+        async with session_lock:
+            viejas = [
+                sid for sid, s in sessions.items()
+                if not s.terminada and (ahora - s.creada_en).total_seconds() > settings.SESSION_TIMEOUT
+            ]
+            for sid in viejas:
+                log.warning("Sesión %s expirada por timeout — eliminando", sid)
+                sessions.pop(sid, None)
+
+
 async def _reintento(session: CallSession, motivo: str) -> None:
     await asyncio.sleep(settings.ESPERA_REINTENTO)
     await actualizar_estado_ticket(session.ticket_id, EstadoTicket.reintento_pendiente)

@@ -32,6 +32,7 @@ class Settings:
     ESPERA_REINTENTO: int  = 3600   # segundos
     TIMEOUT_SILENCIO: int  = 15     # segundos sin respuesta
     MAX_REPETICIONES: int  = 2      # veces que repite pregunta antes de colgar
+    SESSION_TIMEOUT: int   = 300    # segundos máximos que puede vivir una sesión (5 min)
 
     # Textos fijos del flujo
     TEXTO_P1        = "¿Cuenta con servicio de energía en este momento? Marque uno para Sí o dos para No."

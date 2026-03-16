@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 
 
 @dataclass
@@ -19,3 +20,4 @@ class CallSession:
     paso_actual:     int              = 2      # 2=¿tiene servicio? 3=¿sector? 4=¿tipo falla?
     sector:          str              = ""
     tipo_afectacion: str              = ""
+    creada_en:       datetime         = field(default_factory=lambda: datetime.now(timezone.utc))
