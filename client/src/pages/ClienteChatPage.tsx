@@ -14,6 +14,7 @@ const RESULTADO_COLOR: Record<string, string> = {
   cliente_colgo:         'bg-orange-500/10 text-orange-400 border-orange-500/20',
   cancelada_manualmente: 'bg-red-500/10 text-red-400 border-red-500/20',
   error_tecnico:         'bg-red-500/10 text-red-400 border-red-500/20',
+  timeout_sesion:        'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
 }
 
 function resultadoLabel(r: string): string {
@@ -89,7 +90,12 @@ export default function ClienteChatPage() {
                     </div>
                   ))}
                 {llamada.mensajes.filter((m) => m.role !== 'system').length === 0 && (
-                  <p className="text-xs text-[var(--text-muted)] italic">Sin mensajes registrados</p>
+                  <p className="text-xs text-[var(--text-muted)] italic">
+                    {llamada.resultado === 'buzon_de_voz' && 'Llamada atendida por buzón de voz'}
+                    {(llamada.resultado === 'no_contesto' || llamada.resultado === 'timeout_sesion') && 'El cliente no contestó la llamada'}
+                    {llamada.resultado === 'error_tecnico' && 'Error técnico al realizar la llamada'}
+                    {!['buzon_de_voz','no_contesto','timeout_sesion','error_tecnico'].includes(llamada.resultado ?? '') && 'Sin mensajes registrados'}
+                  </p>
                 )}
               </div>
 

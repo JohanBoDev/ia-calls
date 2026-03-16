@@ -193,7 +193,7 @@ async def get_stats() -> dict:
         total_llamadas = (await session.execute(select(func.count(Llamada.id)))).scalar_one()
 
         completadas = (await session.execute(
-            select(func.count(Llamada.id)).where(Llamada.resultado == "completado")
+            select(func.count(Ticket.id)).where(Ticket.estado == EstadoTicket.completado)
         )).scalar_one()
 
         no_contesto = (await session.execute(
