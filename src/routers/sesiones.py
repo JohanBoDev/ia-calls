@@ -25,6 +25,7 @@ async def get_sesiones():
                 "intentos":        s.intentos,
                 "sector":          s.sector,
                 "tipo_afectacion": s.tipo_afectacion,
+                "creada_en":       s.creada_en.isoformat(),
             }
             for s in sessions.values()
         ]
