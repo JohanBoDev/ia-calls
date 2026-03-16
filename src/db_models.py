@@ -33,9 +33,10 @@ class Ticket(Base):
         nullable=False,
         index=True,
     )
-    intentos:        Mapped[int]          = mapped_column(Integer, default=0, nullable=False)
-    creado_en:       Mapped[datetime]     = mapped_column(DateTime(timezone=True), server_default=func.now())
-    actualizado_en:  Mapped[datetime]     = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    intentos:        Mapped[int]               = mapped_column(Integer, default=0, nullable=False)
+    reintento_en:    Mapped[datetime | None]   = mapped_column(DateTime(timezone=True), nullable=True)
+    creado_en:       Mapped[datetime]          = mapped_column(DateTime(timezone=True), server_default=func.now())
+    actualizado_en:  Mapped[datetime]          = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
     llamadas: Mapped[list["Llamada"]] = relationship(back_populates="ticket", cascade="all, delete-orphan")
 

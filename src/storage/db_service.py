@@ -29,11 +29,13 @@ async def get_tickets_pendientes() -> list[Ticket]:
         return list(result.scalars().all())
 
 
-async def actualizar_estado_ticket(ticket_id: int, estado: EstadoTicket) -> None:
+async def actualizar_estado_ticket(ticket_id: int, estado: EstadoTicket, reintento_en: datetime | None = None) -> None:
     async with AsyncSessionLocal() as session:
         ticket = await session.get(Ticket, ticket_id)
         if ticket:
             ticket.estado = estado
+            if reintento_en is not None:
+                ticket.reintento_en = reintento_en
             await session.commit()
 
 
@@ -162,8 +164,9 @@ async def get_tickets_con_ultima_llamada() -> list[dict]:
             "estado":         ticket.estado.value,
             "intentos":       ticket.intentos,
             "creado_en":      ticket.creado_en.isoformat() if ticket.creado_en else None,
-            "ultima_llamada": llamada.iniciada_en.isoformat() if llamada and llamada.iniciada_en else None,
+            "ultima_llamada":   llamada.iniciada_en.isoformat() if llamada and llamada.iniciada_en else None,
             "ultimo_resultado": llamada.resultado if llamada else None,
+            "reintento_en":     ticket.reintento_en.isoformat() if ticket.reintento_en else None,
         })
     return items
 

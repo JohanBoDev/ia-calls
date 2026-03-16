@@ -11,6 +11,7 @@ export interface ClienteResumen {
   creado_en:        string | null
   ultima_llamada:   string | null
   ultimo_resultado: string | null
+  reintento_en:     string | null
 }
 
 export interface Mensaje {

@@ -26,6 +26,16 @@ const ESTADO_LABEL: Record<string, string> = {
   fallido:              'Fallido',
 }
 
+function tiempoRestante(reintento_en: string | null): string {
+  if (!reintento_en) return 'Reintento'
+  const diff = new Date(reintento_en).getTime() - Date.now()
+  if (diff <= 0) return 'Reintentando...'
+  const m = Math.floor(diff / 60000)
+  const h = Math.floor(m / 60)
+  if (h > 0) return `Reintentar en ${h}h ${m % 60}m`
+  return `Reintentar en ${m}m`
+}
+
 export default function ClientesPage() {
   const { data: tickets = [], isLoading } = useClientesQuery()
   const [seleccion, setSeleccion] = useState<Set<number>>(new Set())
@@ -123,7 +133,7 @@ export default function ClientesPage() {
                       <td className="px-5 py-4 text-[var(--text-secondary)]">{t.municipio}</td>
                       <td className="px-5 py-4">
                         <span className={cn('text-xs border px-2.5 py-1 rounded-full font-medium', ESTADO_BADGE[t.estado] ?? ESTADO_BADGE.pendiente)}>
-                          {ESTADO_LABEL[t.estado] ?? t.estado}
+                          {t.estado === 'reintento_pendiente' ? tiempoRestante(t.reintento_en) : (ESTADO_LABEL[t.estado] ?? t.estado)}
                         </span>
                       </td>
                       <td className="px-5 py-4 text-[var(--text-secondary)] text-xs">

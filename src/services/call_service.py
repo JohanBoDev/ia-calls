@@ -191,6 +191,8 @@ async def manejar_call_status(call_sid: str, status: str) -> None:
     if status in ("busy", "no-answer"):
         if session.intentos < settings.MAX_INTENTOS:
             log.info("Programando reintento para %s (intento %d)", call_sid, session.intentos + 1)
+            async with session_lock:
+                sessions.pop(call_sid, None)
             asyncio.create_task(_reintento(session, status))
         else:
             log.info("Máximo de intentos alcanzado para %s", call_sid)
@@ -239,8 +241,9 @@ async def limpiar_sesiones_viejas() -> None:
 
 
 async def _reintento(session: CallSession, motivo: str) -> None:
+    reintento_en = datetime.now(timezone.utc) + timedelta(seconds=settings.ESPERA_REINTENTO)
+    await actualizar_estado_ticket(session.ticket_id, EstadoTicket.reintento_pendiente, reintento_en=reintento_en)
     await asyncio.sleep(settings.ESPERA_REINTENTO)
-    await actualizar_estado_ticket(session.ticket_id, EstadoTicket.reintento_pendiente)
 
     log.info("Reintentando llamada a %s (motivo: %s)", session.telefono, motivo)
     try:
