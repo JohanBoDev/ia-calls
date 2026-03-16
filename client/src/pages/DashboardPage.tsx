@@ -1,6 +1,6 @@
 import { Phone, Activity, Users, Server, Mic, Zap, Bot, PhoneCall, Terminal } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 import { useHealthQuery } from '@/features/llamadas/hooks/useHealthQuery'
 import { useIniciarLlamadasMutation } from '@/features/llamadas/hooks/useLlamadasMutation'
 import { useStatsQuery } from '@/features/stats/hooks/useStatsQuery'
@@ -86,42 +86,60 @@ export default function DashboardPage() {
         {/* Gráficas */}
         {stats && stats.distribucion_tipo.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
-            {stats.distribucion_tipo.length > 0 && (
-              <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl p-5">
-                <h2 className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-widest mb-4">
-                  Tipo de afectación
-                </h2>
-                <ResponsiveContainer width="100%" height={180}>
-                  <PieChart>
-                    <Pie data={stats.distribucion_tipo} dataKey="cantidad" nameKey="tipo" cx="50%" cy="50%" outerRadius={70} label={({ name }) => String(name).replace('_', ' ')}>
-                      {stats.distribucion_tipo.map((entry) => (
-                        <Cell key={entry.tipo} fill={TIPO_COLOR[entry.tipo] ?? '#8b949e'} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8 }}
-                      labelStyle={{ color: 'var(--text-primary)' }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-            )}
+            {/* Tipo de afectación — barras */}
+            <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl p-5">
+              <h2 className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-widest mb-4">
+                Tipo de afectación
+              </h2>
+              <ResponsiveContainer width="100%" height={160}>
+                <BarChart data={stats.distribucion_tipo} layout="vertical" barCategoryGap={10}>
+                  <XAxis type="number" hide />
+                  <YAxis
+                    type="category"
+                    dataKey="tipo"
+                    width={90}
+                    tick={{ fill: 'var(--text-secondary)', fontSize: 11 }}
+                    tickFormatter={(v) => String(v).replace(/_/g, ' ')}
+                  />
+                  <Tooltip
+                    cursor={{ fill: 'rgba(255,255,255,0.04)' }}
+                    contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12 }}
+                    labelFormatter={(v) => String(v).replace(/_/g, ' ')}
+                    formatter={(v) => [v, 'Casos']}
+                  />
+                  <Bar dataKey="cantidad" radius={[0, 6, 6, 0]}>
+                    {stats.distribucion_tipo.map((entry) => (
+                      <Cell key={entry.tipo} fill={TIPO_COLOR[entry.tipo] ?? '#8b949e'} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
 
+            {/* Resumen */}
             <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl p-5">
               <h2 className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-widest mb-4">
                 Resumen
               </h2>
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {[
-                  { label: 'Completadas',  value: stats.completadas,  color: '#22c55e' },
-                  { label: 'No contestó',  value: stats.no_contesto,  color: '#f59e0b' },
+                  { label: 'Completadas', value: stats.completadas, color: '#22c55e', total: stats.total_llamadas },
+                  { label: 'No contestó', value: stats.no_contesto, color: '#f59e0b', total: stats.total_llamadas },
                 ].map((item) => (
-                  <div key={item.label} className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full" style={{ background: item.color }} />
-                      <span className="text-[var(--text-secondary)]">{item.label}</span>
+                  <div key={item.label} className="space-y-1.5">
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full" style={{ background: item.color }} />
+                        <span className="text-[var(--text-secondary)]">{item.label}</span>
+                      </div>
+                      <span className="font-bold text-[var(--text-primary)]">{item.value}</span>
                     </div>
-                    <span className="font-bold text-[var(--text-primary)]">{item.value}</span>
+                    <div className="h-1.5 bg-[var(--border)] rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{ width: `${item.total ? Math.round(item.value / item.total * 100) : 0}%`, background: item.color }}
+                      />
+                    </div>
                   </div>
                 ))}
               </div>

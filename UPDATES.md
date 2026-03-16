@@ -48,8 +48,9 @@ https://dnkwb11cb5641.cloudfront.net
 
 > CloudFront puede tener caché. Si los cambios no se ven, invalidar:
 > ```bash
-> aws cloudfront create-invalidation --distribution-id <ID> --paths "/*"
+> aws cloudfront create-invalidation --distribution-id EB77M122ZAMEX --paths "/*"
 > ```
+> Si da error `AccessDenied`, ir a IAM → Users → enel-calls-deploy → Add permissions → **CloudFrontFullAccess**
 
 ---
 
