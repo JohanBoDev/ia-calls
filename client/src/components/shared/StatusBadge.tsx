@@ -18,19 +18,21 @@ export function StatusBadge({ status, label }: Props) {
         display: 'inline-flex',
         alignItems: 'center',
         gap: 6,
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: 600,
         color: c.text,
-        letterSpacing: '0.04em',
+        letterSpacing: '0.1em',
+        textTransform: 'uppercase',
+        fontFamily: "'Chakra Petch', sans-serif",
       }}
     >
       <span
         style={{
-          width: 7,
-          height: 7,
+          width: 6,
+          height: 6,
           borderRadius: '50%',
           background: c.dot,
-          boxShadow: c.pulse ? `0 0 6px ${c.dot}` : 'none',
+          boxShadow: c.pulse ? `0 0 8px ${c.dot}, 0 0 3px ${c.dot}` : 'none',
           display: 'inline-block',
           flexShrink: 0,
         }}

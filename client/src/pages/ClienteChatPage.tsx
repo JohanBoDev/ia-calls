@@ -58,8 +58,8 @@ export default function ClienteChatPage() {
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
           <div>
             <p
-              className="mono"
-              style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.2em', marginBottom: 6 }}
+              className="mono page-eyebrow"
+              style={{ fontSize: 10, color: 'var(--accent)', letterSpacing: '0.28em', marginBottom: 8, textTransform: 'uppercase', opacity: 0.7 }}
             >
               HISTORIAL DE LLAMADAS
             </p>
@@ -245,7 +245,7 @@ export default function ClienteChatPage() {
                         <span style={{ color: 'var(--text-secondary)' }}>
                           {r.pregunta.split('¿')[1]?.split('?')[0] ?? r.pregunta}:
                         </span>
-                        <span className="mono" style={{ fontWeight: 600, color: 'var(--accent)', fontSize: 11 }}>
+                        <span className="mono" style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: 11 }}>
                           {r.respuesta}
                         </span>
                       </div>

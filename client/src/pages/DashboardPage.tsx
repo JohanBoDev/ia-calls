@@ -1,4 +1,4 @@
-import { Phone, Activity, Users, Server, Mic, Zap, Bot, PhoneCall, Terminal, TrendingUp } from 'lucide-react'
+import { Phone, Activity, Users, Server, Mic, Zap, Bot, PhoneCall, Terminal, TrendingUp, ArrowUpRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 import { useHealthQuery } from '@/features/llamadas/hooks/useHealthQuery'
@@ -8,17 +8,48 @@ import { useSesionesQuery } from '@/features/sesiones/hooks/useSesionesQuery'
 import { StatusBadge } from '@/components/shared/StatusBadge'
 
 const SERVICIO_ICON: Record<string, React.ReactNode> = {
-  twilio:    <Phone size={14} />,
-  azure_tts: <Mic size={14} />,
-  deepgram:  <Zap size={14} />,
-  deepseek:  <Bot size={14} />,
+  twilio:    <Phone size={13} />,
+  azure_tts: <Mic size={13} />,
+  deepgram:  <Zap size={13} />,
+  deepseek:  <Bot size={13} />,
 }
 
 const TIPO_COLOR: Record<string, string> = {
-  falla_total:  '#ef4444',
-  luz_bajita:   '#f59e0b',
-  microcortes:  '#22d3ee',
+  falla_total:  '#ff5252',
+  luz_bajita:   '#ffab40',
+  microcortes:  '#00e676',
 }
+
+const METRICS = (stats: any, loadingStats: boolean) => [
+  {
+    label: 'Total tickets',
+    value: loadingStats ? '—' : (stats?.total_tickets ?? '—'),
+    icon: <Users size={14} />,
+    color: '#22d3ee',
+    delay: 'animate-fade-in',
+  },
+  {
+    label: 'Total llamadas',
+    value: loadingStats ? '—' : (stats?.total_llamadas ?? '—'),
+    icon: <Phone size={14} />,
+    color: '#ffab40',
+    delay: 'animate-fade-in-2',
+  },
+  {
+    label: 'Completadas',
+    value: loadingStats ? '—' : (stats?.completadas ?? '—'),
+    icon: <Activity size={14} />,
+    color: '#40c4ff',
+    delay: 'animate-fade-in-3',
+  },
+  {
+    label: '% Completada',
+    value: loadingStats ? '—' : (stats ? `${stats.pct_completada}%` : '—'),
+    icon: <TrendingUp size={14} />,
+    color: '#ea80fc',
+    delay: 'animate-fade-in-4',
+  },
+]
 
 export default function DashboardPage() {
   const { data: health, isLoading: loadingHealth } = useHealthQuery()
@@ -28,37 +59,7 @@ export default function DashboardPage() {
 
   const globalStatus = loadingHealth ? 'loading' : health?.status === 'ok' ? 'ok' : 'degraded'
   const sesionesActivas = sesiones.filter((s) => !s.terminada).length
-
-  const metrics = [
-    {
-      label: 'Total tickets',
-      value: stats?.total_tickets ?? '—',
-      icon: <Users size={16} />,
-      color: 'var(--accent)',
-      delay: 'animate-fade-in',
-    },
-    {
-      label: 'Total llamadas',
-      value: stats?.total_llamadas ?? '—',
-      icon: <Phone size={16} />,
-      color: 'var(--amber)',
-      delay: 'animate-fade-in-2',
-    },
-    {
-      label: 'Completadas',
-      value: stats?.completadas ?? '—',
-      icon: <Activity size={16} />,
-      color: 'var(--success)',
-      delay: 'animate-fade-in-3',
-    },
-    {
-      label: '% Completada',
-      value: stats ? `${stats.pct_completada}%` : '—',
-      icon: <TrendingUp size={16} />,
-      color: '#a855f7',
-      delay: 'animate-fade-in-4',
-    },
-  ]
+  const metrics = METRICS(stats, loadingStats)
 
   return (
     <div>
@@ -69,43 +70,52 @@ export default function DashboardPage() {
           display: 'flex',
           alignItems: 'flex-start',
           justifyContent: 'space-between',
-          marginBottom: 32,
+          marginBottom: 36,
         }}
       >
         <div>
           <p
-            className="mono"
-            style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.2em', marginBottom: 6 }}
+            className="mono page-eyebrow"
+            style={{
+              fontSize: 10,
+              color: 'var(--accent)',
+              letterSpacing: '0.28em',
+              marginBottom: 8,
+              textTransform: 'uppercase',
+              opacity: 0.7,
+            }}
           >
-            PANEL DE CONTROL
+            Panel de control
           </p>
           <h1
             style={{
-              fontSize: 26,
-              fontWeight: 800,
-              letterSpacing: '-0.01em',
+              fontSize: 32,
+              fontWeight: 700,
+              letterSpacing: '-0.02em',
               color: 'var(--text-primary)',
-              lineHeight: 1.1,
+              lineHeight: 1,
+              textTransform: 'uppercase',
             }}
           >
-            ENEL AI Calls
+            Morpheo
           </h1>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 10 }}>
             <StatusBadge status={globalStatus} />
             {sesionesActivas > 0 && (
               <span
                 className="mono animate-live"
                 style={{
-                  fontSize: 10,
+                  fontSize: 9,
                   color: 'var(--success)',
-                  background: 'rgba(16,185,129,0.1)',
-                  border: '1px solid rgba(16,185,129,0.2)',
-                  borderRadius: 20,
-                  padding: '2px 8px',
-                  letterSpacing: '0.08em',
+                  background: 'rgba(0,230,118,0.08)',
+                  border: '1px solid rgba(0,230,118,0.2)',
+                  borderRadius: 4,
+                  padding: '3px 8px',
+                  letterSpacing: '0.14em',
+                  textTransform: 'uppercase',
                 }}
               >
-                ● {sesionesActivas} EN VIVO
+                ● {sesionesActivas} en vivo
               </span>
             )}
           </div>
@@ -115,9 +125,9 @@ export default function DashboardPage() {
           onClick={() => iniciar()}
           disabled={isPending || globalStatus === 'loading'}
           className="btn-accent"
-          style={{ padding: '12px 24px', fontSize: 13 }}
+          style={{ padding: '13px 24px', fontSize: 12 }}
         >
-          <Phone size={16} strokeWidth={2.5} />
+          <Phone size={15} strokeWidth={2.5} />
           {isPending ? 'Iniciando...' : 'Iniciar llamadas'}
         </button>
       </div>
@@ -127,57 +137,57 @@ export default function DashboardPage() {
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(4, 1fr)',
-          gap: 14,
-          marginBottom: 24,
+          gap: 12,
+          marginBottom: 20,
         }}
       >
         {metrics.map((m) => (
-          <div key={m.label} className={`metric-card ${m.delay}`} style={{ padding: '20px 20px 18px' }}>
+          <div
+            key={m.label}
+            className={`metric-card ${m.delay}`}
+            style={{ padding: '20px 20px 18px', '--metric-color': m.color } as React.CSSProperties}
+          >
             <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                marginBottom: 12,
+                marginBottom: 14,
               }}
             >
               <span
-                style={{
-                  fontSize: 10,
-                  fontWeight: 600,
-                  letterSpacing: '0.14em',
-                  textTransform: 'uppercase',
-                  color: 'var(--text-secondary)',
-                }}
+                className="section-label"
+                style={{ fontSize: 9, letterSpacing: '0.16em' }}
               >
                 {m.label}
               </span>
               <div
                 style={{
-                  width: 28,
-                  height: 28,
-                  borderRadius: 8,
+                  width: 26,
+                  height: 26,
+                  borderRadius: 6,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  background: `${m.color}18`,
+                  background: `${m.color}14`,
                   color: m.color,
+                  border: `1px solid ${m.color}22`,
                 }}
               >
                 {m.icon}
               </div>
             </div>
             <p
-              className="mono"
+              className="mono animate-number"
               style={{
-                fontSize: 32,
-                fontWeight: 600,
+                fontSize: 36,
+                fontWeight: 500,
                 color: loadingStats ? 'var(--text-muted)' : 'var(--text-primary)',
                 lineHeight: 1,
                 letterSpacing: '-0.02em',
               }}
             >
-              {loadingStats ? '—' : m.value}
+              {m.value}
             </p>
           </div>
         ))}
@@ -186,29 +196,29 @@ export default function DashboardPage() {
       {/* ── Nav cards ── */}
       <div
         className="animate-fade-in-2"
-        style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14, marginBottom: 24 }}
+        style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 20 }}
       >
         {[
           {
             to: '/clientes',
-            icon: <Users size={18} style={{ color: 'var(--accent)' }} />,
+            icon: <Users size={16} />,
             label: 'Tickets',
             sub: 'Historial de llamadas',
-            accent: 'var(--accent)',
+            color: '#22d3ee',
           },
           {
             to: '/sesiones',
-            icon: <PhoneCall size={18} style={{ color: 'var(--success)' }} />,
+            icon: <PhoneCall size={16} />,
             label: 'Sesiones activas',
             sub: `${sesionesActivas} en curso`,
-            accent: 'var(--success)',
+            color: '#40c4ff',
           },
           {
             to: '/logs',
-            icon: <Terminal size={18} style={{ color: 'var(--text-secondary)' }} />,
+            icon: <Terminal size={16} />,
             label: 'Logs',
             sub: 'Stream en tiempo real',
-            accent: 'var(--text-secondary)',
+            color: '#ffab40',
           },
         ].map((item) => (
           <Link
@@ -217,28 +227,32 @@ export default function DashboardPage() {
             style={{ textDecoration: 'none' }}
             className="card card-hover"
           >
-            <div style={{ padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 14 }}>
-              <div
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 10,
-                  background: `${item.accent}12`,
-                  border: `1px solid ${item.accent}20`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                }}
-              >
-                {item.icon}
+            <div style={{ padding: '18px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                <div
+                  style={{
+                    width: 38,
+                    height: 38,
+                    borderRadius: 8,
+                    background: `${item.color}10`,
+                    border: `1px solid ${item.color}22`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: item.color,
+                    flexShrink: 0,
+                  }}
+                >
+                  {item.icon}
+                </div>
+                <div>
+                  <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 3, letterSpacing: '0.01em' }}>
+                    {item.label}
+                  </p>
+                  <p style={{ fontSize: 11, color: 'var(--text-secondary)', fontWeight: 400 }}>{item.sub}</p>
+                </div>
               </div>
-              <div>
-                <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 2 }}>
-                  {item.label}
-                </p>
-                <p style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{item.sub}</p>
-              </div>
+              <ArrowUpRight size={15} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
             </div>
           </Link>
         ))}
@@ -248,30 +262,19 @@ export default function DashboardPage() {
       {stats && stats.distribucion_tipo.length > 0 && (
         <div
           className="animate-fade-in-3"
-          style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 24 }}
+          style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}
         >
           {/* Bar chart */}
           <div className="card" style={{ padding: '20px 20px 16px' }}>
-            <p
-              style={{
-                fontSize: 10,
-                fontWeight: 600,
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase',
-                color: 'var(--text-secondary)',
-                marginBottom: 18,
-              }}
-            >
-              Tipo de afectación
-            </p>
-            <ResponsiveContainer width="100%" height={150}>
+            <p className="section-label" style={{ marginBottom: 20 }}>Tipo de afectación</p>
+            <ResponsiveContainer width="100%" height={Math.max(60, stats.distribucion_tipo.length * 48)}>
               <BarChart data={stats.distribucion_tipo} layout="vertical" barCategoryGap={10}>
                 <XAxis type="number" hide />
                 <YAxis
                   type="category"
                   dataKey="tipo"
-                  width={95}
-                  tick={{ fill: 'var(--text-secondary)', fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}
+                  width={90}
+                  tick={{ fill: 'var(--text-secondary)', fontSize: 11, fontFamily: "'DM Mono', monospace" }}
                   tickFormatter={(v) => String(v).replace(/_/g, ' ')}
                   axisLine={false}
                   tickLine={false}
@@ -279,18 +282,20 @@ export default function DashboardPage() {
                 <Tooltip
                   cursor={{ fill: 'rgba(255,255,255,0.03)' }}
                   contentStyle={{
-                    background: 'var(--bg-card)',
-                    border: '1px solid var(--border)',
+                    background: '#0d1520',
+                    border: '1px solid #1e3248',
                     borderRadius: 8,
-                    fontSize: 11,
-                    fontFamily: "'Syne', sans-serif",
-                    color: 'var(--text-primary)',
+                    fontSize: 12,
+                    fontFamily: "'Chakra Petch', sans-serif",
+                    color: '#e8f1f8',
                   }}
+                  labelStyle={{ color: '#e8f1f8', fontWeight: 600 }}
+                  itemStyle={{ color: '#7aaec8' }}
                   labelFormatter={(v) => String(v).replace(/_/g, ' ')}
                   formatter={(v) => [v, 'Casos']}
                 />
-                <Bar dataKey="cantidad" radius={[0, 6, 6, 0]} maxBarSize={18}>
-                  {stats.distribucion_tipo.map((entry) => (
+                <Bar dataKey="cantidad" radius={[0, 5, 5, 0]} maxBarSize={16}>
+                  {stats.distribucion_tipo.map((entry: any) => (
                     <Cell key={entry.tipo} fill={TIPO_COLOR[entry.tipo] ?? 'var(--accent)'} />
                   ))}
                 </Bar>
@@ -300,22 +305,11 @@ export default function DashboardPage() {
 
           {/* Summary */}
           <div className="card" style={{ padding: '20px 20px 16px' }}>
-            <p
-              style={{
-                fontSize: 10,
-                fontWeight: 600,
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase',
-                color: 'var(--text-secondary)',
-                marginBottom: 20,
-              }}
-            >
-              Resumen de llamadas
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            <p className="section-label" style={{ marginBottom: 22 }}>Resumen de llamadas</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
               {[
-                { label: 'Completadas',  value: stats.completadas, color: 'var(--success)', total: stats.total_llamadas },
-                { label: 'No contestó', value: stats.no_contesto, color: 'var(--warning)', total: stats.total_llamadas },
+                { label: 'Completadas',  value: stats.completadas,  color: 'var(--success)', total: stats.total_llamadas },
+                { label: 'No contestó', value: stats.no_contesto,  color: 'var(--warning)', total: stats.total_llamadas },
               ].map((item) => {
                 const pct = item.total ? Math.round((item.value / item.total) * 100) : 0
                 return (
@@ -331,19 +325,19 @@ export default function DashboardPage() {
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                         <div
                           style={{
-                            width: 8,
-                            height: 8,
+                            width: 6,
+                            height: 6,
                             borderRadius: '50%',
                             background: item.color,
-                            boxShadow: `0 0 6px ${item.color}`,
+                            boxShadow: `0 0 8px ${item.color}`,
                           }}
                         />
-                        <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{item.label}</span>
+                        <span style={{ fontSize: 13, color: 'var(--text-secondary)', fontWeight: 500 }}>{item.label}</span>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
                         <span
-                          className="mono"
-                          style={{ fontSize: 18, fontWeight: 600, color: 'var(--text-primary)' }}
+                          className="mono page-eyebrow"
+                          style={{ fontSize: 20, fontWeight: 500, color: 'var(--text-primary)', lineHeight: 1 }}
                         >
                           {item.value}
                         </span>
@@ -368,77 +362,41 @@ export default function DashboardPage() {
 
       {/* ── Services ── */}
       <div className="card animate-fade-in-4" style={{ padding: '20px 24px' }}>
-        <p
-          style={{
-            fontSize: 10,
-            fontWeight: 600,
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase',
-            color: 'var(--text-secondary)',
-            marginBottom: 18,
-          }}
-        >
-          Servicios externos
-        </p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
-          {health
-            ? Object.entries(health.servicios).map(([nombre, srv]) => (
-                <div
-                  key={nombre}
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 8,
-                    padding: '12px 14px',
-                    background: 'var(--bg-primary)',
-                    borderRadius: 8,
-                    border: '1px solid var(--border-subtle)',
-                  }}
-                >
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 7,
-                      color: 'var(--text-secondary)',
-                      fontSize: 12,
-                      fontWeight: 600,
-                      textTransform: 'capitalize',
-                    }}
-                  >
-                    {SERVICIO_ICON[nombre] ?? <Server size={14} />}
-                    {nombre.replace('_', ' ')}
-                  </div>
-                  <StatusBadge status={srv.status === 'ok' ? 'ok' : 'error'} />
-                </div>
-              ))
-            : ['twilio', 'azure_tts', 'deepgram', 'deepseek'].map((s) => (
-                <div
-                  key={s}
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 8,
-                    padding: '12px 14px',
-                    background: 'var(--bg-primary)',
-                    borderRadius: 8,
-                    border: '1px solid var(--border-subtle)',
-                  }}
-                >
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 7,
-                      color: 'var(--text-secondary)',
-                      fontSize: 12,
-                    }}
-                  >
-                    {SERVICIO_ICON[s]} {s.replace('_', ' ')}
-                  </div>
-                  <StatusBadge status="loading" />
-                </div>
-              ))}
+        <p className="section-label" style={{ marginBottom: 16 }}>Servicios externos</p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+          {(health
+            ? Object.entries(health.servicios)
+            : ['twilio', 'azure_tts', 'deepgram', 'deepseek'].map((s) => [s, { status: 'loading' }])
+          ).map(([nombre, srv]: any) => (
+            <div
+              key={nombre}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '10px 14px',
+                background: 'var(--bg-primary)',
+                borderRadius: 8,
+                border: '1px solid var(--border-subtle)',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  color: 'var(--text-secondary)',
+                  fontSize: 12,
+                  fontWeight: 500,
+                  textTransform: 'capitalize',
+                }}
+              >
+                {SERVICIO_ICON[nombre] ?? <Server size={13} />}
+                {String(nombre).replace('_', ' ')}
+              </div>
+              <StatusBadge status={srv.status === 'ok' ? 'ok' : srv.status === 'loading' ? 'loading' : 'error'} />
+            </div>
+          ))}
         </div>
       </div>
     </div>

@@ -155,7 +155,7 @@ export default function ClientesPage() {
       {/* Header */}
       <div className="animate-fade-in" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 20 }}>
         <div>
-          <p className="mono" style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.2em', marginBottom: 6 }}>
+          <p className="mono page-eyebrow" style={{ fontSize: 10, color: 'var(--accent)', letterSpacing: '0.28em', marginBottom: 8, textTransform: 'uppercase', opacity: 0.7 }}>
             GESTIÓN
           </p>
           <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>

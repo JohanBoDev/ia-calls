@@ -194,8 +194,8 @@ export default function SesionesPage() {
       >
         <div>
           <p
-            className="mono"
-            style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.2em', marginBottom: 6 }}
+            className="mono page-eyebrow"
+            style={{ fontSize: 10, color: 'var(--accent)', letterSpacing: '0.28em', marginBottom: 8, textTransform: 'uppercase', opacity: 0.7 }}
           >
             TIEMPO REAL
           </p>

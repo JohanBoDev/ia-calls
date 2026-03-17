@@ -150,7 +150,7 @@ export default function GesiPage() {
     <div>
       {/* Header */}
       <div className="animate-fade-in" style={{ marginBottom: 24 }}>
-        <p className="mono" style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.2em', marginBottom: 6 }}>
+        <p className="mono page-eyebrow" style={{ fontSize: 10, color: 'var(--accent)', letterSpacing: '0.28em', marginBottom: 8, textTransform: 'uppercase', opacity: 0.7 }}>
           CONFIGURACIÓN
         </p>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>

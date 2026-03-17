@@ -1,0 +1,6 @@
+2026-03-16 22:27:50 [INFO] health: Health check — ok=True sesiones=0
+2026-03-16 22:29:02 [INFO] logs_ws: Cliente conectado al stream de logs
+2026-03-16 22:29:04 [INFO] logs_ws: Cliente desconectado del stream de logs
+2026-03-16 22:30:39 [INFO] logs_ws: Cliente conectado al stream de logs
+2026-03-16 22:30:49 [INFO] logs_ws: Cliente desconectado del stream de logs
+2026-03-16 22:32:01 [INFO] health: Health check — ok=True sesiones=0

@@ -20,8 +20,8 @@ export default function LogsPage() {
       >
         <div>
           <p
-            className="mono"
-            style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.2em', marginBottom: 6 }}
+            className="mono page-eyebrow"
+            style={{ fontSize: 10, color: 'var(--accent)', letterSpacing: '0.28em', marginBottom: 8, textTransform: 'uppercase', opacity: 0.7 }}
           >
             SISTEMA
           </p>
@@ -95,11 +95,12 @@ export default function LogsPage() {
 
       {/* Log terminal */}
       <div
-        className="card animate-fade-in"
+        className="card animate-fade-in log-terminal"
         style={{ overflow: 'hidden' }}
       >
         {/* Terminal title bar */}
         <div
+          className="log-terminal-bar"
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -118,6 +119,7 @@ export default function LogsPage() {
             <Terminal size={11} color="var(--text-muted)" />
             <span
               className="mono"
+              className="log-bar-label"
               style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.12em' }}
             >
               system.log — {logs.length} líneas
@@ -127,6 +129,7 @@ export default function LogsPage() {
 
         {/* Log entries */}
         <div
+          className="log-terminal-body"
           style={{
             minHeight: 400,
             maxHeight: 'calc(100vh - 280px)',
@@ -159,6 +162,7 @@ export default function LogsPage() {
               return (
                 <div
                   key={i}
+                  className="log-row"
                   style={{
                     display: 'grid',
                     gridTemplateColumns: '70px 42px 120px 1fr',
@@ -178,7 +182,7 @@ export default function LogsPage() {
                 >
                   {/* Timestamp */}
                   <span
-                    className="mono"
+                    className="mono log-ts"
                     style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.04em', paddingRight: 8 }}
                   >
                     {log.ts}
@@ -195,6 +199,7 @@ export default function LogsPage() {
                   {/* Module */}
                   <span
                     className="mono"
+                    className="log-module"
                     style={{
                       fontSize: 10,
                       color: 'var(--accent)',
@@ -210,7 +215,7 @@ export default function LogsPage() {
 
                   {/* Message */}
                   <span
-                    className="mono"
+                    className="mono log-msg"
                     style={{ fontSize: 11, color: 'var(--text-primary)', wordBreak: 'break-all', lineHeight: 1.6 }}
                   >
                     {log.mensaje}
