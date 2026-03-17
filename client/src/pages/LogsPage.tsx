@@ -118,8 +118,7 @@ export default function LogsPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, justifyContent: 'center' }}>
             <Terminal size={11} color="var(--text-muted)" />
             <span
-              className="mono"
-              className="log-bar-label"
+              className="mono log-bar-label"
               style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.12em' }}
             >
               system.log — {logs.length} líneas
@@ -198,8 +197,7 @@ export default function LogsPage() {
 
                   {/* Module */}
                   <span
-                    className="mono"
-                    className="log-module"
+                    className="mono log-module"
                     style={{
                       fontSize: 10,
                       color: 'var(--accent)',

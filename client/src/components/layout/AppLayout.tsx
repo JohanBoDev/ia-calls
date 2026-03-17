@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
-import { LayoutDashboard, Users, PhoneCall, Terminal, Sun, Moon, BrainCircuit, SlidersHorizontal } from 'lucide-react'
+import { LayoutDashboard, Users, PhoneCall, Terminal, Sun, Moon, SlidersHorizontal } from 'lucide-react'
 
 const NAV_ITEMS = [
   { to: '/',         icon: LayoutDashboard,   label: 'Dashboard', exact: true },
@@ -55,7 +55,20 @@ export function AppLayout() {
                 flexShrink: 0,
               }}
             >
-              <BrainCircuit size={20} color="#030f08" strokeWidth={2.5} />
+              <svg viewBox="0 0 40 40" width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path stroke="#030f08" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M10 20C10 14.4772 14.4772 10 20 10C21.1046 10 22 10.8954 22 12V14C22 15.1046 21.1046 16 20 16" />
+                <path stroke="#030f08" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M10 20C10 25.5228 14.4772 30 20 30C21.1046 30 22 29.1046 22 28V26C22 24.8954 21.1046 24 20 24" />
+                <path stroke="#030f08" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M10 20H14" />
+                <path stroke="#030f08" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M16 16V24" />
+                <circle fill="#030f08" cx="10" cy="20" r="1.5" />
+                <circle fill="#030f08" cx="16" cy="16" r="1.5" />
+                <circle fill="#030f08" cx="16" cy="24" r="1.5" />
+                <circle fill="#030f08" cx="20" cy="16" r="1" />
+                <circle fill="#030f08" cx="20" cy="24" r="1" />
+                <path stroke="#030f08" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M26 14C28.2091 16.2091 29.5 19.1046 29.5 22C29.5 24.8954 28.2091 27.7909 26 30" />
+                <path stroke="#030f08" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M32 10C35.3137 13.3137 37 17.6569 37 22C37 26.3431 35.3137 30.6863 32 34" />
+                <path stroke="#030f08" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M22 22H26" />
+              </svg>
             </div>
             <div>
               <div
