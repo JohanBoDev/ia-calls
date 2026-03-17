@@ -2,7 +2,7 @@ import enum
 from datetime import datetime
 
 from sqlalchemy import (
-    BigInteger, DateTime, Enum, ForeignKey,
+    BigInteger, Boolean, DateTime, Enum, ForeignKey,
     Integer, String, Text, func,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -27,6 +27,8 @@ class Ticket(Base):
     telefono:        Mapped[str]          = mapped_column(String(20), nullable=False)
     sector:          Mapped[str]          = mapped_column(String(200), nullable=False)
     municipio:       Mapped[str]          = mapped_column(String(200), nullable=False)
+    nombre:          Mapped[str | None]   = mapped_column(String(300), nullable=True)
+    estado_gesi:     Mapped[str | None]   = mapped_column(String(10), nullable=True)
     estado:          Mapped[EstadoTicket] = mapped_column(
         Enum(EstadoTicket, name="estado_ticket"),
         default=EstadoTicket.pendiente,
@@ -80,3 +82,45 @@ class MensajeLlamada(Base):
     registrado_en: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     llamada: Mapped["Llamada"] = relationship(back_populates="mensajes")
+
+
+# ── Catálogos GESI ─────────────────────────────────────────────────────────────
+
+class GesiDepartamento(Base):
+    __tablename__ = "gesi_departamentos"
+
+    id:     Mapped[int]  = mapped_column(Integer, primary_key=True, autoincrement=True)
+    nombre: Mapped[str]  = mapped_column(String(200), unique=True, nullable=False)
+    activo: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+
+
+class GesiEstadoTicket(Base):
+    __tablename__ = "gesi_estados_ticket"
+
+    id:     Mapped[int]  = mapped_column(Integer, primary_key=True, autoincrement=True)
+    nombre: Mapped[str]  = mapped_column(String(200), unique=True, nullable=False)
+    activo: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+
+
+class GesiOrigen(Base):
+    __tablename__ = "gesi_origenes"
+
+    id:     Mapped[int]  = mapped_column(Integer, primary_key=True, autoincrement=True)
+    nombre: Mapped[str]  = mapped_column(String(200), unique=True, nullable=False)
+    activo: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+
+
+class GesiTipoTicket(Base):
+    __tablename__ = "gesi_tipos_ticket"
+
+    id:     Mapped[int]  = mapped_column(Integer, primary_key=True, autoincrement=True)
+    nombre: Mapped[str]  = mapped_column(String(200), unique=True, nullable=False)
+    activo: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+
+
+class GesiMunicipio(Base):
+    __tablename__ = "gesi_municipios"
+
+    id:     Mapped[int]  = mapped_column(Integer, primary_key=True, autoincrement=True)
+    nombre: Mapped[str]  = mapped_column(String(200), unique=True, nullable=False)
+    activo: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)

@@ -6,6 +6,8 @@ export interface ClienteResumen {
   telefono:         string
   sector:           string
   municipio:        string
+  nombre:           string | null
+  estado_gesi:      string | null
   estado:           string
   intentos:         number
   creado_en:        string | null

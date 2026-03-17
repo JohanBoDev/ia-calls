@@ -4,7 +4,10 @@ from datetime import datetime, timezone
 from sqlalchemy import func, select
 
 from database import AsyncSessionLocal
-from db_models import EstadoTicket, Llamada, MensajeLlamada, Respuesta, Ticket
+from db_models import (
+    EstadoTicket, GesiDepartamento, GesiEstadoTicket, GesiMunicipio,
+    GesiOrigen, GesiTipoTicket, Llamada, MensajeLlamada, Respuesta, Ticket,
+)
 
 
 # ── tickets ────────────────────────────────────────────────────────────────────
@@ -52,26 +55,45 @@ async def eliminar_tickets(ticket_ids: list[int]) -> dict:
 
 
 async def crear_tickets(tickets: list) -> dict:
-    """Inserta tickets nuevos; ignora duplicados por numero_ticket."""
+    """Inserta o actualiza tickets por numero_ticket (upsert)."""
     from sqlalchemy.dialects.postgresql import insert as pg_insert
+    from sqlalchemy import text as sa_text
     creados = 0
-    duplicados = 0
+    actualizados = 0
     async with AsyncSessionLocal() as session:
         for t in tickets:
-            stmt = pg_insert(Ticket).values(
+            values: dict = dict(
                 numero_ticket=t.numero_ticket,
                 telefono=t.telefono,
                 sector=t.sector,
                 municipio=t.municipio,
                 estado=EstadoTicket.pendiente,
-            ).on_conflict_do_nothing(index_elements=["numero_ticket"])
+            )
+            # Campos opcionales presentes solo en importación GESI
+            if hasattr(t, "nombre") and t.nombre is not None:
+                values["nombre"] = t.nombre
+            if hasattr(t, "estado_gesi") and t.estado_gesi is not None:
+                values["estado_gesi"] = t.estado_gesi
+
+            set_values = {k: v for k, v in values.items() if k != "numero_ticket"}
+
+            stmt = (
+                pg_insert(Ticket)
+                .values(**values)
+                .on_conflict_do_update(
+                    index_elements=["numero_ticket"],
+                    set_=set_values,
+                )
+                .returning(sa_text("(xmax = 0) AS is_insert"))
+            )
             result = await session.execute(stmt)
-            if result.rowcount:
+            row = result.fetchone()
+            if row and row[0]:
                 creados += 1
             else:
-                duplicados += 1
+                actualizados += 1
         await session.commit()
-    return {"creados": creados, "duplicados": duplicados}
+    return {"creados": creados, "actualizados": actualizados}
 
 
 # ── llamadas ───────────────────────────────────────────────────────────────────
@@ -161,6 +183,8 @@ async def get_tickets_con_ultima_llamada() -> list[dict]:
             "telefono":       ticket.telefono,
             "sector":         ticket.sector,
             "municipio":      ticket.municipio,
+            "nombre":         ticket.nombre,
+            "estado_gesi":    ticket.estado_gesi,
             "estado":         ticket.estado.value,
             "intentos":       ticket.intentos,
             "creado_en":      ticket.creado_en.isoformat() if ticket.creado_en else None,
@@ -257,4 +281,121 @@ async def get_stats() -> dict:
         "no_contesto":        no_contesto,
         "pct_completada":     round(completadas / total_llamadas * 100, 1) if total_llamadas else 0,
         "distribucion_tipo":  distribucion_tipo,
+    }
+
+
+# ── GESI catálogos ─────────────────────────────────────────────────────────────
+
+def _catalog_to_dict(row) -> dict:
+    return {"id": row.id, "nombre": row.nombre, "activo": row.activo}
+
+def _municipio_to_dict(row) -> dict:
+    return {"id": row.id, "nombre": row.nombre, "activo": row.activo}
+
+
+def _make_catalog_crud(Model, order_col):
+    """Genera las 4 operaciones CRUD para un catálogo simple (nombre, activo)."""
+    async def _get():
+        async with AsyncSessionLocal() as session:
+            r = await session.execute(select(Model).order_by(order_col))
+            return [_catalog_to_dict(x) for x in r.scalars().all()]
+
+    async def _create(nombre: str):
+        async with AsyncSessionLocal() as session:
+            row = Model(nombre=nombre, activo=True)
+            session.add(row)
+            await session.commit()
+            await session.refresh(row)
+            return _catalog_to_dict(row)
+
+    async def _toggle(id: int, activo: bool):
+        async with AsyncSessionLocal() as session:
+            row = await session.get(Model, id)
+            if not row:
+                return None
+            row.activo = activo
+            await session.commit()
+            return _catalog_to_dict(row)
+
+    async def _delete(id: int):
+        async with AsyncSessionLocal() as session:
+            row = await session.get(Model, id)
+            if not row:
+                return False
+            await session.delete(row)
+            await session.commit()
+            return True
+
+    return _get, _create, _toggle, _delete
+
+
+get_gesi_departamentos, crear_gesi_departamento, toggle_gesi_departamento, eliminar_gesi_departamento = \
+    _make_catalog_crud(GesiDepartamento, GesiDepartamento.nombre)
+
+get_gesi_estados, crear_gesi_estado, toggle_gesi_estado, eliminar_gesi_estado = \
+    _make_catalog_crud(GesiEstadoTicket, GesiEstadoTicket.nombre)
+
+get_gesi_origenes, crear_gesi_origen, toggle_gesi_origen, eliminar_gesi_origen = \
+    _make_catalog_crud(GesiOrigen, GesiOrigen.nombre)
+
+get_gesi_tipos, crear_gesi_tipo, toggle_gesi_tipo, eliminar_gesi_tipo = \
+    _make_catalog_crud(GesiTipoTicket, GesiTipoTicket.nombre)
+
+
+async def get_gesi_municipios() -> list[dict]:
+    async with AsyncSessionLocal() as session:
+        r = await session.execute(select(GesiMunicipio).order_by(GesiMunicipio.nombre))
+        return [_municipio_to_dict(x) for x in r.scalars().all()]
+
+async def crear_gesi_municipio(nombre: str) -> dict:
+    async with AsyncSessionLocal() as session:
+        row = GesiMunicipio(nombre=nombre, activo=True)
+        session.add(row)
+        await session.commit()
+        await session.refresh(row)
+        return _municipio_to_dict(row)
+
+async def toggle_gesi_municipio(id: int, activo: bool) -> dict | None:
+    async with AsyncSessionLocal() as session:
+        row = await session.get(GesiMunicipio, id)
+        if not row:
+            return None
+        row.activo = activo
+        await session.commit()
+        return _municipio_to_dict(row)
+
+async def eliminar_gesi_municipio(id: int) -> bool:
+    async with AsyncSessionLocal() as session:
+        row = await session.get(GesiMunicipio, id)
+        if not row:
+            return False
+        await session.delete(row)
+        await session.commit()
+        return True
+
+
+async def get_filtros_activos() -> dict:
+    """Retorna los filtros activos para usar en la llamada a GESI."""
+    async with AsyncSessionLocal() as session:
+        deps = (await session.execute(
+            select(GesiDepartamento).where(GesiDepartamento.activo == True)
+        )).scalars().all()
+        estados = (await session.execute(
+            select(GesiEstadoTicket).where(GesiEstadoTicket.activo == True)
+        )).scalars().all()
+        origenes = (await session.execute(
+            select(GesiOrigen).where(GesiOrigen.activo == True)
+        )).scalars().all()
+        tipos = (await session.execute(
+            select(GesiTipoTicket).where(GesiTipoTicket.activo == True)
+        )).scalars().all()
+        municipios = (await session.execute(
+            select(GesiMunicipio).where(GesiMunicipio.activo == True)
+        )).scalars().all()
+    return {
+        "departamentos": [d.nombre for d in deps],
+        "estados":       [e.nombre for e in estados],
+        "origenes":      [o.nombre for o in origenes],
+        "tipos":         [t.nombre for t in tipos],
+        "municipios":    [m.nombre for m in municipios],
     }

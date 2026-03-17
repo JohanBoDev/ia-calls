@@ -10,3 +10,6 @@ asyncpg
 alembic
 azure-cognitiveservices-speech
 python-multipart
+requests
+requests-ntlm
+openpyxl

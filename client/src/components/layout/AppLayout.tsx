@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
-import { LayoutDashboard, Users, PhoneCall, Terminal, Sun, Moon, Zap } from 'lucide-react'
+import { LayoutDashboard, Users, PhoneCall, Terminal, Sun, Moon, Zap, SlidersHorizontal } from 'lucide-react'
 
 const NAV_ITEMS = [
-  { to: '/',         icon: LayoutDashboard, label: 'Dashboard', exact: true },
-  { to: '/clientes', icon: Users,           label: 'Tickets'              },
-  { to: '/sesiones', icon: PhoneCall,       label: 'Sesiones'             },
-  { to: '/logs',     icon: Terminal,        label: 'Logs'                 },
+  { to: '/',         icon: LayoutDashboard,   label: 'Dashboard', exact: true },
+  { to: '/clientes', icon: Users,             label: 'Tickets'              },
+  { to: '/sesiones', icon: PhoneCall,         label: 'Sesiones'             },
+  { to: '/logs',     icon: Terminal,          label: 'Logs'                 },
+  { to: '/gesi',     icon: SlidersHorizontal, label: 'GESI'                 },
 ]
 
 export function AppLayout() {

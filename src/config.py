@@ -24,6 +24,14 @@ class Settings:
     # App
     BASE_URL: str = os.getenv("BASE_URL", "")
 
+    # GESI
+    GESI_URL: str           = os.getenv("GESI_URL", "")
+    GESI_USER: str          = os.getenv("GESI_USER", "")
+    GESI_PASSWORD: str      = os.getenv("GESI_PASSWORD", "")
+    GESI_TOKEN_SECURITY: str = os.getenv("GESI_TOKEN_SECURITY", "")
+    GESI_COOKIE: str        = os.getenv("GESI_COOKIE", "")
+    GESI_DTPC: str          = os.getenv("GESI_DTPC", "")
+
     # Base de datos
     DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql+asyncpg://postgres:postgres@localhost:5432/ai_calls")
 

@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from services.audio_service import pregenerar_audios
 from services.call_service import limpiar_sesiones_viejas
-from routers import calls, stream, clients, health, sesiones, stats, logs
+from routers import calls, stream, clients, health, sesiones, stats, logs, gesi
 
 
 @asynccontextmanager
@@ -33,6 +33,7 @@ app.include_router(health.router)
 app.include_router(sesiones.router)
 app.include_router(stats.router)
 app.include_router(logs.router)
+app.include_router(gesi.router)
 
 
 if __name__ == "__main__":
