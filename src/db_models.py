@@ -30,8 +30,8 @@ class Ticket(Base):
     telefono:        Mapped[str]          = mapped_column(String(20), nullable=False)
     sector:          Mapped[str]          = mapped_column(String(200), nullable=False)
     municipio:       Mapped[str]          = mapped_column(String(200), nullable=False)
-    nombre:          Mapped[str | None]   = mapped_column(String(300), nullable=True)
-    estado_gesi:     Mapped[str | None]   = mapped_column(String(10), nullable=True)
+    nombre:          Mapped[Optional[str]]   = mapped_column(String(300), nullable=True)
+    estado_gesi:     Mapped[Optional[str]]   = mapped_column(String(10), nullable=True)
     estado:          Mapped[EstadoTicket] = mapped_column(
         Enum(EstadoTicket, name="estado_ticket"),
         default=EstadoTicket.pendiente,
@@ -39,7 +39,7 @@ class Ticket(Base):
         index=True,
     )
     intentos:        Mapped[int]               = mapped_column(Integer, default=0, nullable=False)
-    reintento_en:    Mapped[datetime | None]   = mapped_column(DateTime(timezone=True), nullable=True)
+    reintento_en:    Mapped[Optional[datetime]]   = mapped_column(DateTime(timezone=True), nullable=True)
     creado_en:       Mapped[datetime]          = mapped_column(DateTime(timezone=True), server_default=func.now())
     actualizado_en:  Mapped[datetime]          = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
@@ -51,10 +51,10 @@ class Llamada(Base):
 
     id:           Mapped[int]       = mapped_column(Integer, primary_key=True, autoincrement=True)
     ticket_id:    Mapped[int]       = mapped_column(ForeignKey("tickets.id", ondelete="CASCADE"), nullable=False, index=True)
-    call_sid:     Mapped[str | None] = mapped_column(String(100), unique=True, nullable=True)
+    call_sid:     Mapped[Optional[str]] = mapped_column(String(100), unique=True, nullable=True)
     iniciada_en:  Mapped[datetime]  = mapped_column(DateTime(timezone=True), server_default=func.now())
-    terminada_en: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-    resultado:    Mapped[str | None] = mapped_column(String(50), nullable=True)  # completado | no_contesto | fallido
+    terminada_en: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    resultado:    Mapped[Optional[str]] = mapped_column(String(50), nullable=True)  # completado | no_contesto | fallido
 
     ticket:    Mapped["Ticket"]               = relationship(back_populates="llamadas")
     respuestas: Mapped[list["Respuesta"]]     = relationship(back_populates="llamada", cascade="all, delete-orphan")
